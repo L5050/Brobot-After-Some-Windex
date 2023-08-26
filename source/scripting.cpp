@@ -113,7 +113,7 @@ EVT_BEGIN(checkMarioDeath)
 EVT_END()
 
 EVT_BEGIN(underchompAttack1)
-    USER_FUNC(spm::an2_08::evt_rpg_enemy_death_check, 0, LW(0))
+    USER_FUNC(spm::an2_08::evt_rpg_enemy_death_check, 1, LW(0))
     USER_FUNC(spm::an2_08::evt_rpg_underchomp_name_grab, 0, LW(1))
     IF_FLAG(LW(0), 0x8000)
         RETURN()
@@ -1248,7 +1248,7 @@ EVT_END()
 
 
 EVT_BEGIN(beginRPG) //80df2e90
-//USER_FUNC(spm::an::evt_an_init_tpl)
+USER_FUNC(spm::an::evt_an_init_tpl)
 USER_FUNC(spm::evt_snd::evt_snd_bgmon, 0, PTR("BGM_BTL_BOSS_STG4")) //original is BGM_EVT_STG7_RPG1
 USER_FUNC(spm::evt_snd::evt_snd_string_call, 0)
 USER_FUNC(spm::evt_paper::evt_paper_entry, PTR("OFF_house_02"))
@@ -1273,6 +1273,8 @@ USER_FUNC(spm::evt_fade::evt_fade_entry, 1, 300, 0, 0, 0, 255)
 USER_FUNC(spm::evt_fade::evt_fade_end_wait, -1)
 USER_FUNC(spm::evt_msg::evt_msg_print_add, 0, PTR("stg7_2_133_2_001"))
 WAIT_MSEC(2000)
+USER_FUNC(spm::an2_08::evt_rpg_enemy_take_damage, 0, 0, 0, LW(0))
+USER_FUNC(spm::an2_08::evt_rpg_enemy_take_damage, 2, 0, 0, LW(0))
 DO(0)
     USER_FUNC(spm::an2_08::evt_rpg_effect_check, LW(0))
     IF_FLAG(LW(0), 0x1000)

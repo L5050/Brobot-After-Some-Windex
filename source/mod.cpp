@@ -18,6 +18,7 @@
 #include <spm/seqdef.h>
 #include <wii/os/OSError.h>
 #include <wii/gx.h>
+#include <msl/string.h>
 #include <spm/rel/an2_08.h>
 #include <spm/rel/an.h>
 #include <spm/rel/sp4_13.h>
@@ -36,7 +37,7 @@ extern "C" {
 
 s32 rpgTribeID[3] = {0, 0, 0};
 
-void getTribe(); 
+void getTribe();
 asm
 (
   ".global getTribe\n"
@@ -78,7 +79,6 @@ namespace mod {
 bool rpgInProgress = false;
 bool bossFight = false;
 bool loadedStage7 = false;
-const char rpgStart[] = {"Flint Cragley Attacks!<o>"};
 
 /*
     Title Screen Custom Text
@@ -130,17 +130,117 @@ void (*spsndSFXOn)(const char * name);
 s32 (*marioCalcDamageToEnemy)(s32 damageType, s32 tribeId);
 s32 (*evt_inline_evt)(spm::evtmgr::EvtEntry * entry);
 void (*msgUnLoad)(s32 slot);
+bool (*msgLoad)(const char * textFileName, s32 slot);
 const char * (*msgSearch)(const char * msgName);
+
+bool newMsgLoad(const char * textFileName, s32 slot) {
+  const char fileName[] = {"stg7"};
+
+  wii::os::OSReport("%s, %d\n", textFileName, slot);
+  if (loadedStage7 == false) {
+    bool isLoaded = msgLoad(fileName, 2);
+    if (isLoaded == false) {
+       return isLoaded;
+     } else {
+      loadedStage7 = true;
+      return false;
+    }
+  } else {
+    return msgLoad(textFileName, slot);
+  }
+
+}
+
+
+const char * rpgStart = "Underchomp attacks!"
+"<o>";
+
+const char * stg7_2_133_2_002 = "<dq>"
+"<p>"
+"What will you do?"
+"<o>";
+const char * stg7_2_133_2_003 = "<p>"
+"Attack who?"
+"<o>";
+const char * stg7_2_133_2_004 = "<p>"
+"%s attacks!"
+"<o>";
+const char * stg7_2_133_2_008 = "You defeated Brobot!"
+"<k>"
+"<p>"
+"%s receives %d points!"
+"<k>";
+const char wang_cmd_1[] = {"Attack"};
+const char wang_cmd_2[] = {"Technique"};
+const char wang_cmd_3[] = {"Pixl"};
+const char wang_cmd_4[] = {"Item"};
+const char wang_cmd_5[] = {"Switch"};
+const char wang_cmd_6[] = {"Escape"};
+const char wang_special_1[] = {"Flip"};
+const char wang_special_2[] = {"Flame"};
+const char wang_special_3[] = {"Super Jump"};
+const char wang_special_4[] = {"Parasaul"};
+const char wang_level[] = {"LV."};
+const char wang_hp[] = {"HP"};
+const char wang_wang_r[] = {"Red Underchomp"};
+const char wang_wang_b[] = {"Brobot"};
+const char wang_wang_y[] = {"Yellow Underchomp"};
 
 const char * newMsgSearch(const char * msgName) {
 
-  const char ogRpgStart[] = {"stg7_2_133_2_001"};
-
-  if (*msgName == *ogRpgStart) {
-    return rpgStart;
-  } else {
-    return msgSearch(msgName);
-  }
+  if (msl::string::strcmp(msgName, "stg7_2_133_2_001") == 0)
+				// Override intro cutscene's text
+				return rpgStart;
+			else if (msl::string::strcmp(msgName, "stg7_2_133_2_002") == 0)
+				// Add custom tutorial message
+				return stg7_2_133_2_002;
+        else if (msl::string::strcmp(msgName, "wang_cmd_1") == 0)
+  				// Add custom tutorial message
+  				return wang_cmd_1;
+        else if (msl::string::strcmp(msgName, "wang_cmd_2") == 0)
+  				// Add custom tutorial message
+  				return wang_cmd_2;
+          else if (msl::string::strcmp(msgName, "wang_cmd_3") == 0)
+    				// Add custom tutorial message
+    				return wang_cmd_3;
+            else if (msl::string::strcmp(msgName, "wang_cmd_4") == 0)
+      				// Add custom tutorial message
+      				return wang_cmd_4;
+              else if (msl::string::strcmp(msgName, "wang_cmd_5") == 0)
+        				// Add custom tutorial message
+        				return wang_cmd_5;
+                else if (msl::string::strcmp(msgName, "wang_cmd_6") == 0)
+          				// Add custom tutorial message
+          				return wang_cmd_6;
+                  else if (msl::string::strcmp(msgName, "wang_special_1") == 0)
+            				// Add custom tutorial message
+            				return wang_special_1;
+                    else if (msl::string::strcmp(msgName, "wang_special_2") == 0)
+              				// Add custom tutorial message
+              				return wang_special_2;
+                      else if (msl::string::strcmp(msgName, "wang_special_3") == 0)
+                				// Add custom tutorial message
+                				return wang_special_3;
+                        else if (msl::string::strcmp(msgName, "wang_level") == 0)
+                  				// Add custom tutorial message
+                  				return wang_level;
+                          else if (msl::string::strcmp(msgName, "wang_hp") == 0)
+                    				// Add custom tutorial message
+                    				return wang_hp;
+                            else if (msl::string::strcmp(msgName, "stg7_2_133_2_008") == 0)
+                      				// Add custom tutorial message
+                      				return stg7_2_133_2_008;
+                              else if (msl::string::strcmp(msgName, "wang_wang_r") == 0)
+                        				// Add custom tutorial message
+                        				return wang_wang_r;
+                                else if (msl::string::strcmp(msgName, "wang_wang_b") == 0)
+                          				// Add custom tutorial message
+                          				return wang_wang_b;
+                                  else if (msl::string::strcmp(msgName, "wang_wang_y") == 0)
+                            				// Add custom tutorial message
+                            				return wang_wang_y;
+			else
+				return msgSearch(msgName);
 
 }
 
@@ -149,7 +249,7 @@ spm::evtmgr::EvtEntry * newEvtEntry(const spm::evtmgr::EvtScriptCode * script, u
   wii::os::OSReport("%x\n", script);
   if (script == spm::sp4_13::mr_l_appear) {
     wii::os::OSReport("evtEntry\n");
-    entry = evtEntry1(mod::mr_l_appear, priority, flags);
+    entry = evtEntry1(spm::sp4_13::mr_l_appear, priority, flags);
   } else {
     entry = evtEntry1(script, priority, flags);}
     return entry;
@@ -213,7 +313,7 @@ s32 newMarioCalcDamageToEnemy(s32 damageType, s32 tribeId) {
 }
 
 void newMsgUnload(s32 slot) {
-  if (slot != 7) {
+  if (slot != 3) {
     msgUnLoad(slot);
   }
 }
@@ -250,17 +350,19 @@ void hookEvent() {
 
   //evt_inline_evt = patch::hookFunction(spm::evtmgr_cmd::evt_inline_evt, new_evt_inline_evt);
 
-  effNiceEntry = patch::hookFunction(spm::eff_nice::effNiceEntry, newEffNiceEntry);
+  //effNiceEntry = patch::hookFunction(spm::eff_nice::effNiceEntry, newEffNiceEntry);
 
-  //marioCalcDamageToEnemy = patch::hookFunction(spm::mario::marioCalcDamageToEnemy, newMarioCalcDamageToEnemy);
+  marioCalcDamageToEnemy = patch::hookFunction(spm::mario::marioCalcDamageToEnemy, newMarioCalcDamageToEnemy);
 
   //spsndBGMOn = patch::hookFunction(spm::spmario_snd::spsndBGMOn, new_spsndBGMOn);
 
   spsndSFXOn = patch::hookFunction(spm::spmario_snd::spsndSFXOn, new_spsndSFXOn);
 
+  msgLoad = patch::hookFunction(spm::msgdrv::msgLoad, newMsgLoad);
+
   msgUnLoad = patch::hookFunction(spm::msgdrv::msgUnLoad, newMsgUnload);
 
-//  msgSearch = patch::hookFunction(spm::msgdrv::msgSearch, newMsgSearch);
+  msgSearch = patch::hookFunction(spm::msgdrv::msgSearch, newMsgSearch);
   //nopTPL();
   writeBranchLink(&spm::an2_08::rpgHandleMenu, 0x1BC, chooseNewCharacterString);
   writeBranchLink(&spm::an2_08::evt_rpg_calc_damage_to_enemy, 0x44, getTribe);
