@@ -152,7 +152,7 @@ bool newMsgLoad(const char * textFileName, s32 slot) {
 }
 
 
-const char * rpgStart = "Underchomp attacks!"
+const char * rpgStart = "Brobot attacks!"
 "<o>";
 
 const char * stg7_2_133_2_002 = "<dq>"
