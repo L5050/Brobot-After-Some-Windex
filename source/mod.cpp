@@ -287,8 +287,10 @@ namespace mod {
   "<k>\n"
   "<o>\n";
 
-  const char * stg7_2_133_2_028 = "%s uses Slim!\n"
-  "<dkey><wait 250></dkey>\n";
+  const char * stg7_2_133_2_028 = "<p>\n"
+  "%s uses Slim!\n"
+  "<dkey><wait 250></dkey>\n"
+  "<o>\n";
 
   const char * stg7_2_133_2_029 = "<dkey><wait 250></dkey>\n"
   "<p>\n"
@@ -300,8 +302,11 @@ namespace mod {
   "Use it on who?\n"
   "<o>\n";
 
-  const char * stg7_2_133_2_032 = "%s uses Thudley! A heavy-duty attack!\n"
-  "<dkey><wait 250></dkey>\n";
+  const char * stg7_2_133_2_032 = "<p>\n"
+  "%s uses Thudley!\n"
+  "A heavy-duty attack!\n"
+  "<dkey><wait 250></dkey>\n"
+  "<o>\n";
 
   const char * stg7_2_133_2_033 = "The attack is a success!\n"
   "%s takes %d damage!\n"
@@ -330,7 +335,8 @@ namespace mod {
   "Use it on who?\n"
   "<o>\n";
 
-  const char * stg7_2_133_2_038 = "%s uses Fleep on %s!\n"
+  const char * stg7_2_133_2_038 = "<p>\n"
+  "%s uses Fleep on %s!\n"
   "<o>\n";
 
   const char * stg7_2_133_2_039 = "<dkey><wait 250></dkey>\n"
@@ -943,13 +949,13 @@ namespace mod {
     "HP"
   };
   const char wang_wang_r[] = {
-    "Red Underchomp"
+    "Brobot"
   };
   const char wang_wang_b[] = {
     "Brobot"
   };
   const char wang_wang_y[] = {
-    "Yellow Underchomp"
+    "Brobot"
   };
 
   const char * newMsgSearch(const char * msgName) {
