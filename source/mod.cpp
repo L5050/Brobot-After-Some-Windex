@@ -37,7 +37,7 @@ extern "C" {
 
   s32 rpgTribeID[3] = {
     0,
-    0,
+    296,
     0
   };
 
@@ -317,7 +317,9 @@ namespace mod {
   const char * stg7_2_133_2_035 = "<p>\n"
   "%s hops onto Carrie!\n"
   "<dkey><wait 500></dkey>\n"
-  "<p>\n"
+  "<o>\n";
+
+  const char * stg7_2_133_2_036 = "<p>\n"
   "You feel a little taller!\n"
   "<wait 450>...But that is the only\n"
   "effect, unfortunately.\n"
@@ -951,7 +953,7 @@ namespace mod {
   };
 
   const char * newMsgSearch(const char * msgName) {
-    wii::os::OSReport("%s\n", msgName);
+    //wii::os::OSReport("%s\n", msgName);
     if (msl::string::strcmp(msgName, "stg7_2_133_2_001") == 0)
       //Override intro
       return rpgStart;
@@ -1102,6 +1104,9 @@ namespace mod {
 
     else if (msl::string::strcmp(msgName, "stg7_2_133_2_035") == 0)
       return stg7_2_133_2_035;
+
+    else if (msl::string::strcmp(msgName, "stg7_2_133_2_036") == 0)
+      return stg7_2_133_2_036;
 
     else if (msl::string::strcmp(msgName, "stg7_2_133_2_037") == 0)
       return stg7_2_133_2_037;
@@ -1333,9 +1338,9 @@ namespace mod {
   spm::evtmgr::EvtEntry * newEvtEntry(const spm::evtmgr::EvtScriptCode * script, u32 priority, u8 flags) {
     spm::evtmgr::EvtEntry * entry;
     //wii::os::OSReport("%x\n", script);
-    if (script == spm::sp4_13::mr_l_appear) {
+    if (script == spm::sp4_13::brobot_appear) {
       wii::os::OSReport("evtEntry\n");
-      entry = evtEntry1(spm::sp4_13::mr_l_appear, priority, flags);
+      entry = evtEntry1(mod::parentOfBeginRPG, priority, flags);
     } else {
       entry = evtEntry1(script, priority, flags);
     }
@@ -1347,8 +1352,8 @@ namespace mod {
     spm::evtmgr::EvtEntry * entry1;
     if (script == spm::sp4_13::brobot_appear) {
       wii::os::OSReport("evtChildEntry\n");
-      wii::os::OSReport("%x\n", entry -> scriptStart);
-      entry1 = evtChildEntry(entry, spm::sp4_13::brobot_appear, flags);
+      //wii::os::OSReport("%x\n", entry -> scriptStart);
+      entry1 = evtChildEntry(entry, mod::parentOfBeginRPG, flags);
     } else {
       entry1 = evtChildEntry(entry, script, flags);
     }
@@ -1358,9 +1363,9 @@ namespace mod {
   spm::evtmgr::EvtEntry * newEvtBrotherEntry(spm::evtmgr::EvtEntry * brother,
     const spm::evtmgr::EvtScriptCode * script, u8 flags) {
     spm::evtmgr::EvtEntry * entry;
-    if (script == spm::an2_08::begin_rpg_parent_evt) {
+    if (script == spm::sp4_13::brobot_appear) {
       wii::os::OSReport("evtBrotherEntry\n");
-      entry = evtBrotherEntry(brother, parentOfBeginRPG, flags);
+      entry = evtBrotherEntry(brother, mod::parentOfBeginRPG, flags);
     } else {
       entry = evtBrotherEntry(brother, script, flags);
     }
@@ -1369,9 +1374,9 @@ namespace mod {
 
   spm::evtmgr::EvtEntry * newEvtEntryType(const spm::evtmgr::EvtScriptCode * script, u32 priority, u8 flags, u8 type) {
     spm::evtmgr::EvtEntry * entry;
-    if (script == spm::an2_08::begin_rpg_parent_evt) {
+    if (script == spm::sp4_13::brobot_appear) {
       wii::os::OSReport("evtEntryType\n");
-      entry = evtEntryType(parentOfBeginRPG, priority, flags, type);
+      entry = evtEntryType(mod::parentOfBeginRPG, priority, flags, type);
     } else {
       entry = evtEntryType(script, priority, flags, type);
     }
@@ -1380,6 +1385,9 @@ namespace mod {
 
   s32 new_evt_inline_evt(spm::evtmgr::EvtEntry * entry) {
     wii::os::OSReport("%x\n", entry -> scriptStart);
+    if (entry -> scriptStart == spm::sp4_13::mr_l_appear) {
+      wii::os::OSReport("%x\n", entry -> scriptStart);
+    }
     return evt_inline_evt(entry);
   }
 
@@ -1391,7 +1399,6 @@ namespace mod {
   }
 
   s32 newMarioCalcDamageToEnemy(s32 damageType, s32 tribeId) {
-    //spm::effdrv::EffEntry * effentry = effNiceEntry(1, 0, -2139062144, 1600222564, 1601071459);
 
     if (rpgInProgress == false) {
       rpgTribeID[1] = tribeId;
@@ -1443,11 +1450,11 @@ namespace mod {
 
     //evt_inline_evt = patch::hookFunction(spm::evtmgr_cmd::evt_inline_evt, new_evt_inline_evt);
 
-    marioCalcDamageToEnemy = patch::hookFunction(spm::mario::marioCalcDamageToEnemy, newMarioCalcDamageToEnemy);
+    //marioCalcDamageToEnemy = patch::hookFunction(spm::mario::marioCalcDamageToEnemy, newMarioCalcDamageToEnemy);
 
     //spsndBGMOn = patch::hookFunction(spm::spmario_snd::spsndBGMOn, new_spsndBGMOn);
 
-    spsndSFXOn = patch::hookFunction(spm::spmario_snd::spsndSFXOn, new_spsndSFXOn);
+    //spsndSFXOn = patch::hookFunction(spm::spmario_snd::spsndSFXOn, new_spsndSFXOn);
 
     msgUnLoad = patch::hookFunction(spm::msgdrv::msgUnLoad, newMsgUnload);
 
@@ -1501,13 +1508,21 @@ namespace mod {
         return 2;
       }
     }
+    return 2;
+  }
+
+  void patchBrobot() {
+
+    spm::npcdrv::npcTribes[295].maxHp = 1;
+    spm::npcdrv::npcTribes[296].maxHp = 100;
+    spm::npcdrv::npcTribes[296].attackStrength = 100;
   }
 
   void main() {
     wii::os::OSReport("SPM Rel Loader: the mod has ran!\n");
     titleScreenCustomTextPatch();
     hookEvent();
-    spm::evtmgr::evtEntry(mod::loadMsgFile, 0, 0);
+    patchBrobot();
   }
 
 }
