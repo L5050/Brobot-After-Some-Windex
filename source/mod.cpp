@@ -40,7 +40,9 @@ extern "C" {
     296,
     0
   };
-
+  s32 test() {
+    return 296;
+  }
   void getTribe();
   asm
     (
@@ -86,7 +88,7 @@ namespace mod {
 
   /*
       Title Screen Custom Text
-      Prints "SPM RPG Battles" at the top of the title screen
+      Prints "Brobot After Some Windex" at the top of the title screen
   */
 
   static spm::seqdef::SeqFunc * seq_titleMainReal;
@@ -99,7 +101,7 @@ namespace mod {
       255
     };
     f32 scale = 0.8;
-    const char * msg = "SPM RPG Battles";
+    const char * msg = "Brobot After Some Windex";
     spm::fontmgr::FontDrawStart();
     spm::fontmgr::FontDrawEdge();
     spm::fontmgr::FontDrawColor( & green);
@@ -115,7 +117,7 @@ namespace mod {
     seq_gameMainReal(wp);
   }
 
-  static void titleScreenCustomTextPatch() {
+  static void titleScreenCustomTextPatch() { 
     seq_titleMainReal = spm::seqdef::seq_data[spm::seqdrv::SEQ_TITLE].main;
     spm::seqdef::seq_data[spm::seqdrv::SEQ_TITLE].main = & seq_titleMainOverride;
     seq_gameMainReal = spm::seqdef::seq_data[spm::seqdrv::SEQ_GAME].main;
@@ -294,7 +296,8 @@ namespace mod {
 
   const char * stg7_2_133_2_029 = "<dkey><wait 250></dkey>\n"
   "<p>\n"
-  "%s turns sideways and is hard to see!\n"
+  "%s turns sideways\n"
+  "and is hard to see!\n"
   "<k>\n"
   "<o>\n";
 
@@ -308,7 +311,8 @@ namespace mod {
   "<dkey><wait 250></dkey>\n"
   "<o>\n";
 
-  const char * stg7_2_133_2_033 = "The attack is a success!\n"
+  const char * stg7_2_133_2_033 = "<p>\n"
+  "The attack is a success!\n"
   "%s takes %d damage!\n"
   "<k>\n"
   "<o>\n";
@@ -361,10 +365,13 @@ namespace mod {
   "Use it on who?\n"
   "<o>\n";
 
-  const char * stg7_2_133_2_044 = "%s uses Cudge<wait 150> to attack %s!\n"
-  "<dkey><wait 250></dkey>\n";
+  const char * stg7_2_133_2_044 = "<p>\n"
+  "%s uses Cudge<wait 150> to attack %s!\n"
+  "<dkey><wait 250></dkey>\n"
+  "<o>\n";
 
-  const char * stg7_2_133_2_045 = "Direct hit!\n"
+  const char * stg7_2_133_2_045 = "<p>\n"
+  "Direct hit!\n"
   "<wait 150>%s takes %d damage!\n"
   "<k>\n"
   "<o>\n";
@@ -376,8 +383,10 @@ namespace mod {
   "<k>\n"
   "<o>\n";
 
-  const char * stg7_2_133_2_047 = "%s uses Dottie!\n"
-  "<dkey><wait 250></dkey>\n";
+  const char * stg7_2_133_2_047 = "<p>\n"
+  "%s uses Dottie!\n"
+  "<dkey><wait 250></dkey>\n"
+  "<o>\n";
 
   const char * stg7_2_133_2_048 = "<dkey><wait 250></dkey>\n"
   "<p>\n"
@@ -385,8 +394,10 @@ namespace mod {
   "<k>\n"
   "<o>\n";
 
-  const char * stg7_2_133_2_050 = "%s uses Piccolo!\n"
-  "<dkey><wait 250></dkey>\n";
+  const char * stg7_2_133_2_050 = "<p>\n"
+  "%s uses Piccolo!\n"
+  "<dkey><wait 250></dkey>\n"
+  "<o>\n";
 
   const char * stg7_2_133_2_051 = "<dkey><wait 250></dkey>\n"
   "<p>\n"
@@ -394,7 +405,8 @@ namespace mod {
   "<k>\n"
   "<o>\n";
 
-  const char * stg7_2_133_2_052 = "%s falls into a deep sleep!\n"
+  const char * stg7_2_133_2_052 = "<p>\n"
+  "%s falls into a deep sleep!\n"
   "<k>\n"
   "<o>\n";
 
@@ -402,10 +414,17 @@ namespace mod {
   "Use it on who?\n"
   "<o>\n";
 
-  const char * stg7_2_133_2_054 = "Spinning destruction!\n"
+  const char * stg7_2_133_2_054 = "<p>\n"
+  "Spinning destruction!\n"
   "<wait 150>Barry slams powerfully into %s!\n"
-  "<dkey><wait 250></dkey>\n";
-  const char * stg7_2_133_2_055 = "Nice hit! <wait 150>%s takes %d damage!\n<k>\n";
+  "<dkey><wait 250></dkey>\n"
+  "<o>\n";
+
+  const char * stg7_2_133_2_055 = "<p>\n"
+  "Nice hit! <wait 150>%s\n"
+  "takes %d damage!\n"
+  "<k>\n"
+  "<o>\n";
 
   const char * stg7_2_133_2_056 = "<dkey><wait 250></dkey>\n"
   "<p>\n"
@@ -417,7 +436,8 @@ namespace mod {
 
   const char * stg7_2_133_2_056_01 = "<p>\n"
   "%s uses Dashell!\n"
-  "<dkey><wait 250></dkey>\n";
+  "<dkey><wait 250></dkey>\n"
+  "<o>\n";
 
   const char * stg7_2_133_2_056_02 = "<dkey><wait 250></dkey>\n"
   "<p>\n"
@@ -1405,16 +1425,10 @@ namespace mod {
   }
 
   s32 newMarioCalcDamageToEnemy(s32 damageType, s32 tribeId) {
-
-    if (rpgInProgress == false) {
-      rpgTribeID[1] = tribeId;
-      wii::os::OSReport("%d %d\n", tribeId, rpgTribeID[0]);
-      spm::evtmgr::evtEntry(parentOfBeginRPG, 1, 0);
-      rpgInProgress = true;
-      return 100;
-    } else {
-      return marioCalcDamageToEnemy(damageType, tribeId);
-    }
+      wii::os::OSReport("%d, %d\n", damageType, tribeId);
+      s32 damage = marioCalcDamageToEnemy(damageType, tribeId);
+      if (tribeId == 295) damage = damage + 4;
+      return damage;
   }
 
   void newMsgUnload(s32 slot) {
@@ -1456,7 +1470,7 @@ namespace mod {
 
     //evt_inline_evt = patch::hookFunction(spm::evtmgr_cmd::evt_inline_evt, new_evt_inline_evt);
 
-    //marioCalcDamageToEnemy = patch::hookFunction(spm::mario::marioCalcDamageToEnemy, newMarioCalcDamageToEnemy);
+    marioCalcDamageToEnemy = patch::hookFunction(spm::mario::marioCalcDamageToEnemy, newMarioCalcDamageToEnemy);
 
     //spsndBGMOn = patch::hookFunction(spm::spmario_snd::spsndBGMOn, new_spsndBGMOn);
 
@@ -1467,8 +1481,9 @@ namespace mod {
     msgSearch = patch::hookFunction(spm::msgdrv::msgSearch, newMsgSearch);
     //nopTPL();
     writeBranchLink( & spm::an2_08::rpgHandleMenu, 0x1BC, chooseNewCharacterString);
-    writeBranchLink( & spm::an2_08::evt_rpg_calc_damage_to_enemy, 0x44, getTribe);
-    writeBranchLink( & spm::an2_08::evt_rpg_npctribe_handle, 0x94, getTribe2);
+    //writeBranchLink( & spm::an2_08::evt_rpg_calc_damage_to_enemy, 0x44, test);
+    writeBranchLink( & spm::an2_08::evt_rpg_npctribe_handle, 0x94, test);
+    writeWord( & spm::an2_08::evt_rpg_calc_damage_to_enemy, 0x44, 0x38800127);
     writeWord( & spm::an2_08::evt_rpg_npctribe_handle, 0xA0, 0x3B9C0004);
     writeWord( & spm::an2_08::evt_rpg_npctribe_handle, 0x8C, 0x3BA00018);
   }
@@ -1506,7 +1521,8 @@ namespace mod {
 
   s32 loadStage7(spm::evtmgr::EvtEntry * evtEntry, bool firstRun) {
     if (loadedStage7 == false) {
-      bool isLoaded = spm::msgdrv::msgLoad(fileName, 7);
+      bool isLoaded = firstRun;
+      isLoaded = spm::msgdrv::msgLoad(fileName, 7);
       if (isLoaded == false) {
         return 0;
       } else {
@@ -1518,8 +1534,8 @@ namespace mod {
   }
 
   void patchBrobot() {
-
     spm::npcdrv::npcTribes[295].maxHp = 1;
+    spm::npcdrv::npcTribes[295].killXp = 100;
     spm::npcdrv::npcTribes[296].maxHp = 100;
     spm::npcdrv::npcTribes[296].attackStrength = 100;
   }
