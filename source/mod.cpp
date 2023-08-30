@@ -117,7 +117,7 @@ namespace mod {
     seq_gameMainReal(wp);
   }
 
-  static void titleScreenCustomTextPatch() { 
+  static void titleScreenCustomTextPatch() {
     seq_titleMainReal = spm::seqdef::seq_data[spm::seqdrv::SEQ_TITLE].main;
     spm::seqdef::seq_data[spm::seqdrv::SEQ_TITLE].main = & seq_titleMainOverride;
     seq_gameMainReal = spm::seqdef::seq_data[spm::seqdrv::SEQ_GAME].main;
@@ -234,7 +234,8 @@ namespace mod {
 
   const char * stg7_2_133_2_017 = "<p>\n"
   "Luigi glares at %s and launches a super jump!\n"
-  "<dkey><wait 250></dkey>\n";
+  "<dkey><wait 250></dkey>\n"
+  "<o>\n";
 
   const char * stg7_2_133_2_018 = "<p>\n"
   "You stomp %s for %d damage!\n"
@@ -932,6 +933,12 @@ namespace mod {
   "<k>\n"
   "<o>\n";
 
+  const char * brobot_toxic_serum = "<p>\n"
+  "Brobot spews out\n"
+  "a toxic serum!\n"
+  "<wait 350>\n"
+  "<o>\n";
+
   const char wang_cmd_1[] = {
     "Attack"
   };
@@ -1354,8 +1361,10 @@ namespace mod {
       return stg7_2_133_2_126;
     else if (msl::string::strcmp(msgName, "stg7_2_133_2_127") == 0)
       return stg7_2_133_2_127;
-      else if (msl::string::strcmp(msgName, "stg7_2_133_2_091") == 0)
-        return stg7_2_133_2_091;
+    else if (msl::string::strcmp(msgName, "stg7_2_133_2_091") == 0)
+      return stg7_2_133_2_091;
+    else if (msl::string::strcmp(msgName, "brobot_toxic_serum") == 0)
+      return brobot_toxic_serum;
     else
       return msgSearch(msgName);
 
@@ -1452,6 +1461,26 @@ namespace mod {
 
   }
 
+  s32 new_evt_rpg_calc_damage_to_enemy(spm::evtmgr::EvtEntry * evtEntry, bool firstRun) {
+    spm::evtmgr::EvtVar * args = (spm::evtmgr::EvtVar *)evtEntry->pCurData;
+    s32 damageType = args[1];
+    s32 damage = spm::mario::marioCalcDamageToEnemy(damageType, rpgTribeID[1]);
+    if (rpgTribeID[1] == 296) damage = damage + 4;
+    spm::evtmgr_cmd::evtSetValue(evtEntry, args[2], damage);
+    if (firstRun == false) {}
+    return 2;
+  }
+
+  s32 new_evt_rpg_calc_mario_damage(spm::evtmgr::EvtEntry * evtEntry, bool firstRun) {
+    spm::evtmgr::EvtVar * args = (spm::evtmgr::EvtVar *)evtEntry->pCurData;
+    s32 attackStrength = spm::an2_08::An2_08_wp.rpgNpcInfo[1].attackStrength;
+    if (attackStrength == 0) attackStrength = 1;
+
+    spm::evtmgr_cmd::evtSetValue(evtEntry, args[1], attackStrength);
+    if (firstRun == false) {}
+    return 2;
+  }
+
   void nopTPL() {
     writeWord( & spm::an2_08::rpg_screen_draw, 0x204, 0x60000000);
     writeWord( & spm::an2_08::rpg_screen_draw, 0x208, 0x60000000);
@@ -1460,6 +1489,9 @@ namespace mod {
   }
 
   void hookEvent() {
+    patch::hookFunction(spm::an2_08::evt_rpg_calc_damage_to_enemy, new_evt_rpg_calc_damage_to_enemy);
+    patch::hookFunction(spm::an2_08::evt_rpg_calc_mario_damage, new_evt_rpg_calc_mario_damage);
+
     evtEntry1 = patch::hookFunction(spm::evtmgr::evtEntry, newEvtEntry);
 
     evtChildEntry = patch::hookFunction(spm::evtmgr::evtChildEntry, newEvtChildEntry);
@@ -1476,14 +1508,12 @@ namespace mod {
 
     //spsndSFXOn = patch::hookFunction(spm::spmario_snd::spsndSFXOn, new_spsndSFXOn);
 
-    msgUnLoad = patch::hookFunction(spm::msgdrv::msgUnLoad, newMsgUnload);
-
     msgSearch = patch::hookFunction(spm::msgdrv::msgSearch, newMsgSearch);
-    //nopTPL();
+
     writeBranchLink( & spm::an2_08::rpgHandleMenu, 0x1BC, chooseNewCharacterString);
     //writeBranchLink( & spm::an2_08::evt_rpg_calc_damage_to_enemy, 0x44, test);
     writeBranchLink( & spm::an2_08::evt_rpg_npctribe_handle, 0x94, test);
-    writeWord( & spm::an2_08::evt_rpg_calc_damage_to_enemy, 0x44, 0x38800127);
+    //writeWord( & spm::an2_08::evt_rpg_calc_damage_to_enemy, 0x44, 0x38800127);
     writeWord( & spm::an2_08::evt_rpg_npctribe_handle, 0xA0, 0x3B9C0004);
     writeWord( & spm::an2_08::evt_rpg_npctribe_handle, 0x8C, 0x3BA00018);
   }
@@ -1505,39 +1535,32 @@ namespace mod {
     return 2;
   }
 
-  s32 getRpgNpc(spm::evtmgr::EvtEntry * evtEntry, bool firstRun) {
-    spm::npcdrv::NPCWork * npcWork = spm::npcdrv::npcGetWorkPtr();
-    if (bossFight == false) {
-      for (int i = 0; i < 525; i++) {
-        if (npcWork -> entries[i].tribeId == rpgTribeID[1]) {
-          spm::evtmgr_cmd::evtSetValue(evtEntry, evtEntry -> lw[0], (s32) npcWork -> entries[i].name);
-          break;
-        }
-      }
-    }
+  s32 increaseAttack(spm::evtmgr::EvtEntry * evtEntry, bool firstRun) {
+    spm::evtmgr::EvtVar * args = (spm::evtmgr::EvtVar *)evtEntry->pCurData;
+    s32 newStrength = args[0];
+    s32 strength = spm::an2_08::An2_08_wp.rpgNpcInfo[1].attackStrength;
+    spm::an2_08::An2_08_wp.rpgNpcInfo[1].attackStrength = strength + newStrength;
+    //spm::evtmgr_cmd::evtSetValue(evtEntry, (spm::evtmgr::EvtVar*)evtEntry->pCurData, 1);
     if (firstRun == false) {}
     return 2;
   }
 
-  s32 loadStage7(spm::evtmgr::EvtEntry * evtEntry, bool firstRun) {
-    if (loadedStage7 == false) {
-      bool isLoaded = firstRun;
-      isLoaded = spm::msgdrv::msgLoad(fileName, 7);
-      if (isLoaded == false) {
-        return 0;
-      } else {
-        loadedStage7 = true;
-        return 2;
-      }
-    }
+  s32 rpg_npc_setup(spm::evtmgr::EvtEntry * evtEntry, bool firstRun) {
+    spm::an2_08::An2_08_wp.rpgNpcInfo[1].attackStrength = spm::npcdrv::npcTribes[rpgTribeID[1]].attackStrength;
+    spm::an2_08::An2_08_wp.rpgNpcInfo[1].maxHp = spm::npcdrv::npcTribes[rpgTribeID[1]].maxHp;
+    spm::an2_08::An2_08_wp.rpgNpcInfo[1].killXp = spm::npcdrv::npcTribes[rpgTribeID[1]].killXp;
+    spm::an2_08::An2_08_wp.rpgNpcInfo[1].flags = 0;
+    spm::an2_08::An2_08_wp.rpgNpcInfo[1].unk_4 = 0;
+    spm::an2_08::An2_08_wp.rpgNpcInfo[1].unk_10 = 0xff;
+    if (firstRun == false) {}
+    if (evtEntry->flags == 0) {}
     return 2;
   }
 
   void patchBrobot() {
     spm::npcdrv::npcTribes[295].maxHp = 1;
     spm::npcdrv::npcTribes[295].killXp = 100;
-    spm::npcdrv::npcTribes[296].maxHp = 100;
-    spm::npcdrv::npcTribes[296].attackStrength = 100;
+    spm::npcdrv::npcTribes[296].maxHp = 200;
   }
 
   void main() {
