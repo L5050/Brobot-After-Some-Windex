@@ -2,6 +2,7 @@
 #include "patch.h"
 #include "scripting.cpp"
 
+#include <spm/system.h>
 #include <spm/spmario_snd.h>
 #include <spm/evtmgr.h>
 #include <spm/mario.h>
@@ -85,6 +86,7 @@ namespace mod {
   bool rpgInProgress = false;
   bool bossFight = false;
   bool loadedStage7 = false;
+  s32 fp = 0;
 
   /*
       Title Screen Custom Text
@@ -114,6 +116,25 @@ namespace mod {
   }
 
   static void seq_gameMainOverride(spm::seqdrv::SeqWork * wp) {
+    if (rpgInProgress == false) {
+    wii::gx::GXColor green = {
+      0,
+      255,
+      0,
+      255
+    };
+    f32 scale = 0.8;
+    char buffer [50];
+    sprintf(buffer, "%d", fp);
+    const char * msg = buffer;
+    spm::fontmgr::FontDrawStart();
+    spm::fontmgr::FontDrawEdge();
+    spm::fontmgr::FontDrawColor( & green);
+    spm::fontmgr::FontDrawScale(scale);
+    spm::fontmgr::FontDrawNoiseOff();
+    spm::fontmgr::FontDrawRainbowColor();
+    f32 x = -((spm::fontmgr::FontGetMessageWidth(msg) * scale) / 2);
+    spm::fontmgr::FontDrawString(x, 200.0, msg);}
     seq_gameMainReal(wp);
   }
 
@@ -137,7 +158,7 @@ namespace mod {
   spm::effdrv::EffEntry * ( * effNiceEntry)(double param_1, double param_2, double param_3, double param_4, int param_5);
   bool( * spsndBGMOn)(u32 flags,
     const char * name);
-  void( * spsndSFXOn)(const char * name);
+  s32( * spsndSFXOn)(const char * name);
   s32( * marioCalcDamageToEnemy)(s32 damageType, s32 tribeId);
   s32( * evt_inline_evt)(spm::evtmgr::EvtEntry * entry);
   void( * msgUnLoad)(s32 slot);
@@ -150,6 +171,8 @@ namespace mod {
   /*
       Custom Text
   */
+
+
   const char * rpgStart = "Brobot attacks!\n"
   "<o>\n";
   const char * stg7_2_133_2_002 = "<dq>\n"
@@ -939,11 +962,24 @@ namespace mod {
   "<wait 350>\n"
   "<o>\n";
 
+  const char * peach_heal = "<p>\n"
+  "Peach calls upon\n"
+  "mushroom magic..."
+  "<dkey><wait 250></dkey>\n"
+  "<o>\n";
+
+  const char * peach_heal_success = "<p>\n"
+  "Success!\n"
+  "Peach heals 20 HP\n"
+  "<o>\n";
+
+  const char * peach_special = "Heal";
+
   const char wang_cmd_1[] = {
     "Attack"
   };
   const char wang_cmd_2[] = {
-    "DON'T PRESS OR YOUR GAME WILL CRASH"
+    "Technique"
   };
   const char wang_cmd_3[] = {
     "Pixl"
@@ -966,9 +1002,6 @@ namespace mod {
   const char wang_special_3[] = {
     "Super Jump"
   };
-  const char wang_special_4[] = {
-    "Parasaul"
-  };
   const char wang_level[] = {
     "LV."
   };
@@ -985,6 +1018,13 @@ namespace mod {
     "Brobot"
   };
 
+  const char * testCharacterStrings[] = {
+    wang_special_1,
+    wang_special_2,
+    wang_special_3,
+    peach_special
+  };
+
   const char * newMsgSearch(const char * msgName) {
     //wii::os::OSReport("%s\n", msgName);
     if (msl::string::strcmp(msgName, "stg7_2_133_2_001") == 0)
@@ -993,6 +1033,9 @@ namespace mod {
     else if (msl::string::strcmp(msgName, "stg7_2_133_2_002") == 0)
       //Replace message
       return stg7_2_133_2_002;
+    else if (msl::string::strcmp(msgName, "peach_heal") == 0)
+        //Replace message
+      return peach_heal;
     else if (msl::string::strcmp(msgName, "wang_cmd_1") == 0)
       //Replace message
       return wang_cmd_1;
@@ -1020,6 +1063,9 @@ namespace mod {
     else if (msl::string::strcmp(msgName, "wang_special_3") == 0)
       //Replace message
       return wang_special_3;
+    else if (msl::string::strcmp(msgName, "peach_special") == 0)
+        //Replace message
+      return peach_special;
     else if (msl::string::strcmp(msgName, "wang_level") == 0)
       //Replace message
       return wang_level;
@@ -1366,6 +1412,7 @@ namespace mod {
     else if (msl::string::strcmp(msgName, "brobot_toxic_serum") == 0)
       return brobot_toxic_serum;
     else
+    //wii::os::OSReport("%s\n", msgName);
       return msgSearch(msgName);
 
   }
@@ -1373,7 +1420,7 @@ namespace mod {
   spm::evtmgr::EvtEntry * newEvtEntry(const spm::evtmgr::EvtScriptCode * script, u32 priority, u8 flags) {
     spm::evtmgr::EvtEntry * entry;
     //wii::os::OSReport("%x\n", script);
-    if (script == spm::sp4_13::brobot_appear) {
+    if (script == spm::sp4_13::evt_brobot_appear) {
       wii::os::OSReport("evtEntry\n");
       entry = evtEntry1(mod::parentOfBeginRPG, priority, flags);
     } else {
@@ -1385,7 +1432,7 @@ namespace mod {
   spm::evtmgr::EvtEntry * newEvtChildEntry(spm::evtmgr::EvtEntry * entry,
     const spm::evtmgr::EvtScriptCode * script, u8 flags) {
     spm::evtmgr::EvtEntry * entry1;
-    if (script == spm::sp4_13::brobot_appear) {
+    if (script == spm::sp4_13::evt_brobot_appear) {
       wii::os::OSReport("evtChildEntry\n");
       //wii::os::OSReport("%x\n", entry -> scriptStart);
       entry1 = evtChildEntry(entry, mod::parentOfBeginRPG, flags);
@@ -1398,7 +1445,7 @@ namespace mod {
   spm::evtmgr::EvtEntry * newEvtBrotherEntry(spm::evtmgr::EvtEntry * brother,
     const spm::evtmgr::EvtScriptCode * script, u8 flags) {
     spm::evtmgr::EvtEntry * entry;
-    if (script == spm::sp4_13::brobot_appear) {
+    if (script == spm::sp4_13::evt_brobot_appear) {
       wii::os::OSReport("evtBrotherEntry\n");
       entry = evtBrotherEntry(brother, mod::parentOfBeginRPG, flags);
     } else {
@@ -1409,7 +1456,7 @@ namespace mod {
 
   spm::evtmgr::EvtEntry * newEvtEntryType(const spm::evtmgr::EvtScriptCode * script, u32 priority, u8 flags, u8 type) {
     spm::evtmgr::EvtEntry * entry;
-    if (script == spm::sp4_13::brobot_appear) {
+    if (script == spm::sp4_13::evt_brobot_appear) {
       wii::os::OSReport("evtEntryType\n");
       entry = evtEntryType(mod::parentOfBeginRPG, priority, flags, type);
     } else {
@@ -1420,7 +1467,7 @@ namespace mod {
 
   s32 new_evt_inline_evt(spm::evtmgr::EvtEntry * entry) {
     wii::os::OSReport("%x\n", entry -> scriptStart);
-    if (entry -> scriptStart == spm::sp4_13::mr_l_appear) {
+    if (entry -> scriptStart == spm::sp4_13::evt_mr_l_appear) {
       wii::os::OSReport("%x\n", entry -> scriptStart);
     }
     return evt_inline_evt(entry);
@@ -1454,10 +1501,10 @@ namespace mod {
 
   }
 
-  void new_spsndSFXOn(const char * name) {
+  s32 new_spsndSFXOn(const char * name) {
 
     wii::os::OSReport("%s\n", name);
-    spsndSFXOn(name);
+    return spsndSFXOn(name);
 
   }
 
@@ -1473,9 +1520,16 @@ namespace mod {
 
   s32 new_evt_rpg_calc_mario_damage(spm::evtmgr::EvtEntry * evtEntry, bool firstRun) {
     spm::evtmgr::EvtVar * args = (spm::evtmgr::EvtVar *)evtEntry->pCurData;
-    s32 attackStrength = spm::an2_08::An2_08_wp.rpgNpcInfo[1].attackStrength;
+    s32 attackStrength = spm::an2_08::an2_08_wp.rpgNpcInfo[1].attackStrength;
     if (attackStrength == 0) attackStrength = 1;
-
+    if ((spm::an2_08::an2_08_wp.unk_54 & 0x40U) != 0) {
+      if (0 < attackStrength) {
+        attackStrength = attackStrength / 2;
+      }
+      if (attackStrength == 0) {
+        attackStrength = 1; 
+      }
+    }
     spm::evtmgr_cmd::evtSetValue(evtEntry, args[1], attackStrength);
     if (firstRun == false) {}
     return 2;
@@ -1488,9 +1542,14 @@ namespace mod {
     writeWord( & spm::an2_08::rpg_screen_draw, 0x310, 0x60000000);
   }
 
+  void patchWangSpecial() {
+    spm::an2_08::wang_special_1_80def2c8[1] = peach_special;
+  }
+
   void hookEvent() {
     patch::hookFunction(spm::an2_08::evt_rpg_calc_damage_to_enemy, new_evt_rpg_calc_damage_to_enemy);
     patch::hookFunction(spm::an2_08::evt_rpg_calc_mario_damage, new_evt_rpg_calc_mario_damage);
+    patchWangSpecial();
 
     evtEntry1 = patch::hookFunction(spm::evtmgr::evtEntry, newEvtEntry);
 
@@ -1510,7 +1569,7 @@ namespace mod {
 
     msgSearch = patch::hookFunction(spm::msgdrv::msgSearch, newMsgSearch);
 
-    writeBranchLink( & spm::an2_08::rpgHandleMenu, 0x1BC, chooseNewCharacterString);
+    //writeBranchLink( & spm::an2_08::rpgHandleMenu, 0x1BC, chooseNewCharacterString);
     //writeBranchLink( & spm::an2_08::evt_rpg_calc_damage_to_enemy, 0x44, test);
     writeBranchLink( & spm::an2_08::evt_rpg_npctribe_handle, 0x94, test);
     //writeWord( & spm::an2_08::evt_rpg_calc_damage_to_enemy, 0x44, 0x38800127);
@@ -1538,20 +1597,22 @@ namespace mod {
   s32 increaseAttack(spm::evtmgr::EvtEntry * evtEntry, bool firstRun) {
     spm::evtmgr::EvtVar * args = (spm::evtmgr::EvtVar *)evtEntry->pCurData;
     s32 newStrength = args[0];
-    s32 strength = spm::an2_08::An2_08_wp.rpgNpcInfo[1].attackStrength;
-    spm::an2_08::An2_08_wp.rpgNpcInfo[1].attackStrength = strength + newStrength;
+    s32 strength = spm::an2_08::an2_08_wp.rpgNpcInfo[1].attackStrength;
+    spm::an2_08::an2_08_wp.rpgNpcInfo[1].attackStrength = strength + newStrength;
     //spm::evtmgr_cmd::evtSetValue(evtEntry, (spm::evtmgr::EvtVar*)evtEntry->pCurData, 1);
     if (firstRun == false) {}
     return 2;
   }
 
   s32 rpg_npc_setup(spm::evtmgr::EvtEntry * evtEntry, bool firstRun) {
-    spm::an2_08::An2_08_wp.rpgNpcInfo[1].attackStrength = spm::npcdrv::npcTribes[rpgTribeID[1]].attackStrength;
-    spm::an2_08::An2_08_wp.rpgNpcInfo[1].maxHp = spm::npcdrv::npcTribes[rpgTribeID[1]].maxHp;
-    spm::an2_08::An2_08_wp.rpgNpcInfo[1].killXp = spm::npcdrv::npcTribes[rpgTribeID[1]].killXp;
-    spm::an2_08::An2_08_wp.rpgNpcInfo[1].flags = 0;
-    spm::an2_08::An2_08_wp.rpgNpcInfo[1].unk_4 = 0;
-    spm::an2_08::An2_08_wp.rpgNpcInfo[1].unk_10 = 0xff;
+    spm::an2_08::an2_08_wp.rpgNpcInfo[1].attackStrength = spm::npcdrv::npcTribes[rpgTribeID[1]].attackStrength;
+    spm::an2_08::an2_08_wp.rpgNpcInfo[1].maxHp = spm::npcdrv::npcTribes[rpgTribeID[1]].maxHp;
+    spm::an2_08::an2_08_wp.rpgNpcInfo[1].killXp = spm::npcdrv::npcTribes[rpgTribeID[1]].killXp;
+    spm::an2_08::an2_08_wp.rpgNpcInfo[1].flags = 0;
+    spm::an2_08::an2_08_wp.rpgNpcInfo[1].unk_4 = 0;
+    spm::an2_08::an2_08_wp.rpgNpcInfo[1].unk_10 = 0xff;
+    rpgInProgress = true;
+    fp = 5;
     if (firstRun == false) {}
     if (evtEntry->flags == 0) {}
     return 2;
