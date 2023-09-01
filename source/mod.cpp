@@ -134,7 +134,8 @@ namespace mod {
     spm::fontmgr::FontDrawNoiseOff();
     spm::fontmgr::FontDrawRainbowColor();
     f32 x = -((spm::fontmgr::FontGetMessageWidth(msg) * scale) / 2);
-    spm::fontmgr::FontDrawString(x+350, 0.0, msg);}
+    spm::fontmgr::FontDrawString(x+350, 0.0, msg);
+  }
     seq_gameMainReal(wp);
   }
 
