@@ -263,7 +263,8 @@ namespace mod {
   "<o>\n";
 
   const char * stg7_2_133_2_017 = "<p>\n"
-  "Luigi glares at %s and launches a super jump!\n"
+  "Luigi glares at %s\n"
+  "and launches a super jump!\n"
   "<dkey><wait 250></dkey>\n"
   "<o>\n";
 
