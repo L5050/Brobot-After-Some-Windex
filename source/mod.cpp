@@ -116,7 +116,7 @@ namespace mod {
   }
 
   static void seq_gameMainOverride(spm::seqdrv::SeqWork * wp) {
-    if (rpgInProgress == false) {
+    if (rpgInProgress == true) {
     wii::gx::GXColor green = {
       0,
       255,
@@ -134,7 +134,7 @@ namespace mod {
     spm::fontmgr::FontDrawNoiseOff();
     spm::fontmgr::FontDrawRainbowColor();
     f32 x = -((spm::fontmgr::FontGetMessageWidth(msg) * scale) / 2);
-    spm::fontmgr::FontDrawString(x, 200.0, msg);}
+    spm::fontmgr::FontDrawString(x+350, 0.0, msg);}
     seq_gameMainReal(wp);
   }
 
@@ -232,7 +232,14 @@ namespace mod {
 
   const char * stg7_2_133_2_012 = "<dkey><wait 250></dkey>\n"
   "<p>\n"
-  "...But nothing happens.\n"
+  "...You found 2 FP!\n"
+  "<k>\n"
+  "<o>\n";
+
+  const char * no_fp = "<dkey><wait 250></dkey>\n"
+  "<p>\n"
+  "no FP?\n"
+  "*Megamind gif*"
   "<k>\n"
   "<o>\n";
 
@@ -964,13 +971,21 @@ namespace mod {
 
   const char * peach_heal = "<p>\n"
   "Peach calls upon\n"
-  "mushroom magic..."
+  "mushroom magic...\n"
   "<dkey><wait 250></dkey>\n"
   "<o>\n";
 
-  const char * peach_heal_success = "<p>\n"
+  const char * peach_heal_success =
+  "<p>\n"
   "Success!\n"
   "Peach heals 20 HP\n"
+  "<dkey><wait 500></dkey>\n"
+  "<o>\n";
+
+  const char * grab_fp = "<p>\n"
+  "Success!\n"
+  "You stole 2 FP!\n"
+  "<dkey><wait 250></dkey>\n"
   "<o>\n";
 
   const char * peach_special = "Heal";
@@ -1036,6 +1051,9 @@ namespace mod {
     else if (msl::string::strcmp(msgName, "peach_heal") == 0)
         //Replace message
       return peach_heal;
+    else if (msl::string::strcmp(msgName, "peach_heal_success") == 0)
+          //Replace message
+      return peach_heal_success;
     else if (msl::string::strcmp(msgName, "wang_cmd_1") == 0)
       //Replace message
       return wang_cmd_1;
@@ -1411,6 +1429,10 @@ namespace mod {
       return stg7_2_133_2_091;
     else if (msl::string::strcmp(msgName, "brobot_toxic_serum") == 0)
       return brobot_toxic_serum;
+    else if (msl::string::strcmp(msgName, "grab_fp") == 0)
+      return grab_fp;
+    else if (msl::string::strcmp(msgName, "no_fp") == 0)
+      return no_fp;
     else
     //wii::os::OSReport("%s\n", msgName);
       return msgSearch(msgName);
@@ -1527,7 +1549,7 @@ namespace mod {
         attackStrength = attackStrength / 2;
       }
       if (attackStrength == 0) {
-        attackStrength = 1; 
+        attackStrength = 1;
       }
     }
     spm::evtmgr_cmd::evtSetValue(evtEntry, args[1], attackStrength);
@@ -1613,6 +1635,41 @@ namespace mod {
     spm::an2_08::an2_08_wp.rpgNpcInfo[1].unk_10 = 0xff;
     rpgInProgress = true;
     fp = 5;
+    if (firstRun == false) {}
+    if (evtEntry->flags == 0) {}
+    return 2;
+  }
+
+  s32 getFP(spm::evtmgr::EvtEntry * evtEntry, bool firstRun) {
+    spm::evtmgr::EvtVar * args = (spm::evtmgr::EvtVar *)evtEntry->pCurData;
+    spm::evtmgr_cmd::evtSetValue(evtEntry, args[0], fp);
+    if (firstRun == false) {}
+    return 2;
+  }
+
+  s32 setFP(spm::evtmgr::EvtEntry * evtEntry, bool firstRun) {
+    spm::evtmgr::EvtVar * args = (spm::evtmgr::EvtVar *)evtEntry->pCurData;
+    fp = args[0];
+    if (firstRun == false) {}
+    return 2;
+  }
+
+  s32 addFP(spm::evtmgr::EvtEntry * evtEntry, bool firstRun) {
+    spm::evtmgr::EvtVar * args = (spm::evtmgr::EvtVar *)evtEntry->pCurData;
+    fp = fp + args[0];
+    if (firstRun == false) {}
+    return 2;
+  }
+
+  s32 subtractFP(spm::evtmgr::EvtEntry * evtEntry, bool firstRun) {
+    spm::evtmgr::EvtVar * args = (spm::evtmgr::EvtVar *)evtEntry->pCurData;
+    fp = fp - args[0];
+    if (firstRun == false) {}
+    return 2;
+  }
+
+  s32 rpg_off(spm::evtmgr::EvtEntry * evtEntry, bool firstRun) {
+    rpgInProgress = false;
     if (firstRun == false) {}
     if (evtEntry->flags == 0) {}
     return 2;
