@@ -3,6 +3,7 @@
 #include "scripting.cpp"
 
 #include <spm/system.h>
+#include <spm/camdrv.h>
 #include <spm/spmario_snd.h>
 #include <spm/evtmgr.h>
 #include <spm/mario.h>
@@ -11,6 +12,7 @@
 #include <spm/seq_mapchange.h>
 #include <spm/effdrv.h>
 #include <spm/eff_nice.h>
+#include <spm/dispdrv.h>
 #include <spm/animdrv.h>
 #include <spm/npcdrv.h>
 #include <spm/camdrv.h>
@@ -19,10 +21,13 @@
 #include <spm/seqdef.h>
 #include <wii/os/OSError.h>
 #include <wii/gx.h>
+#include <wii/mtx.h>
 #include <msl/string.h>
 #include <spm/rel/an2_08.h>
 #include <spm/rel/an.h>
 #include <spm/rel/sp4_13.h>
+USING(wii::mtx::Vec3)
+
 extern "C" {
   char marioString[] = "Flip";
   char peachString[] = "Heal";
@@ -115,29 +120,35 @@ namespace mod {
     seq_titleMainReal(wp);
   }
 
-  static void seq_gameMainOverride(spm::seqdrv::SeqWork * wp) {
-    if (rpgInProgress == true) {
-    wii::gx::GXColor green = {
-      0,
-      255,
-      0,
-      255
-    };
-    f32 scale = 0.8;
-    char buffer [50];
-    sprintf(buffer, "%d", fp);
-    const char * msg = buffer;
-    spm::fontmgr::FontDrawStart();
-    spm::fontmgr::FontDrawEdge();
-    spm::fontmgr::FontDrawColor( & green);
-    spm::fontmgr::FontDrawScale(scale);
-    spm::fontmgr::FontDrawNoiseOff();
-    spm::fontmgr::FontDrawRainbowColor();
-    f32 x = -((spm::fontmgr::FontGetMessageWidth(msg) * scale) / 2);
-    spm::fontmgr::FontDrawString(x+350, 0.0, msg);
+  void drawStuff(s32 cameraId, void * param) {
+      wii::gx::GXColor green = {
+        0,
+        255,
+        0,
+        255
+      };
+      f32 scale = 0.8;
+      char buffer [50];
+      sprintf(buffer, "%d", fp);
+      const char * msg = buffer;
+      spm::fontmgr::FontDrawStart();
+      spm::fontmgr::FontDrawEdge();
+      spm::fontmgr::FontDrawColor( & green);
+      spm::fontmgr::FontDrawScale(scale);
+      spm::fontmgr::FontDrawNoiseOff();
+      spm::fontmgr::FontDrawRainbowColor();
+      f32 x = -((spm::fontmgr::FontGetMessageWidth(msg) * scale) / 2);
+      spm::fontmgr::FontDrawString(x+350, 0.0, msg);
+    const Vec3 fpVec = {-110.0, -200.0, 0.0};
+    spm::icondrv::iconDispGx(1.0, &fpVec, 4, 105);
   }
-    seq_gameMainReal(wp);
-  }
+
+    static void seq_gameMainOverride(spm::seqdrv::SeqWork * wp) {
+    //if (rpgInProgress == true) {
+        spm::dispdrv::dispEntry(spm::camdrv::CAM_ID_2D, 2, 300, drawStuff, nullptr);
+    //  }
+      seq_gameMainReal(wp);
+    }
 
   static void titleScreenCustomTextPatch() {
     seq_titleMainReal = spm::seqdef::seq_data[spm::seqdrv::SEQ_TITLE].main;
