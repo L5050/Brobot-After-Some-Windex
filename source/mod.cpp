@@ -120,7 +120,13 @@ namespace mod {
     seq_titleMainReal(wp);
   }
 
-  void drawStuff(s32 cameraId, void * param) {
+  /*void drawStuff(s32 cameraId, void * param) {
+    const Vec3 fpVec = {-110.0, -200.0, 0.0};
+    spm::icondrv::iconDispGx(1.0, &fpVec, 4, 105);
+  }*/
+
+    static void seq_gameMainOverride(spm::seqdrv::SeqWork * wp) {
+    if (rpgInProgress == true) {
       wii::gx::GXColor green = {
         0,
         255,
@@ -138,15 +144,27 @@ namespace mod {
       spm::fontmgr::FontDrawNoiseOff();
       spm::fontmgr::FontDrawRainbowColor();
       f32 x = -((spm::fontmgr::FontGetMessageWidth(msg) * scale) / 2);
-      spm::fontmgr::FontDrawString(x+350, 0.0, msg);
-    const Vec3 fpVec = {-110.0, -200.0, 0.0};
-    spm::icondrv::iconDispGx(1.0, &fpVec, 4, 105);
-  }
-
-    static void seq_gameMainOverride(spm::seqdrv::SeqWork * wp) {
-    //if (rpgInProgress == true) {
-        spm::dispdrv::dispEntry(spm::camdrv::CAM_ID_2D, 2, 300, drawStuff, nullptr);
-    //  }
+      spm::fontmgr::FontDrawString(x+-50, -161.0, msg);
+        //spm::dispdrv::dispEntry(spm::camdrv::CAM_ID_2D, 2, 300.0, drawStuff, nullptr);
+      }
+      if (rpgInProgress == true) {
+        wii::gx::GXColor green = {
+          0,
+          255,
+          0,
+          255
+        };
+        f32 scale = 0.8;
+        const char * msg = "FP:";
+        spm::fontmgr::FontDrawStart();
+        spm::fontmgr::FontDrawEdge();
+        spm::fontmgr::FontDrawColor( & green);
+        spm::fontmgr::FontDrawScale(scale);
+        spm::fontmgr::FontDrawNoiseOff();
+        spm::fontmgr::FontDrawRainbowColorOff();
+        f32 x = -((spm::fontmgr::FontGetMessageWidth(msg) * scale) / 2);
+        spm::fontmgr::FontDrawString(x+-90, -161.0, msg);
+        }
       seq_gameMainReal(wp);
     }
 
