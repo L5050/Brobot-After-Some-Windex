@@ -1009,8 +1009,8 @@ namespace mod {
   const char * peach_heal_success =
   "<p>\n"
   "Success!\n"
-  "Peach heals 20 HP\n"
-  "<dkey><wait 500></dkey>\n"
+  "Peach heals 20 HP!\n"
+  "<k>\n"
   "<o>\n";
 
   const char * grab_fp = "<p>\n"
@@ -1473,7 +1473,7 @@ namespace mod {
   spm::evtmgr::EvtEntry * newEvtEntry(const spm::evtmgr::EvtScriptCode * script, u32 priority, u8 flags) {
     spm::evtmgr::EvtEntry * entry;
     //wii::os::OSReport("%x\n", script);
-    if (script == spm::sp4_13::evt_brobot_appear) {
+    if (script == spm::sp4_13::brobot_appear_evt) {
       wii::os::OSReport("evtEntry\n");
       entry = evtEntry1(mod::parentOfBeginRPG, priority, flags);
     } else {
@@ -1485,7 +1485,7 @@ namespace mod {
   spm::evtmgr::EvtEntry * newEvtChildEntry(spm::evtmgr::EvtEntry * entry,
     const spm::evtmgr::EvtScriptCode * script, u8 flags) {
     spm::evtmgr::EvtEntry * entry1;
-    if (script == spm::sp4_13::evt_brobot_appear) {
+    if (script == spm::sp4_13::brobot_appear_evt) {
       wii::os::OSReport("evtChildEntry\n");
       //wii::os::OSReport("%x\n", entry -> scriptStart);
       entry1 = evtChildEntry(entry, mod::parentOfBeginRPG, flags);
@@ -1498,7 +1498,7 @@ namespace mod {
   spm::evtmgr::EvtEntry * newEvtBrotherEntry(spm::evtmgr::EvtEntry * brother,
     const spm::evtmgr::EvtScriptCode * script, u8 flags) {
     spm::evtmgr::EvtEntry * entry;
-    if (script == spm::sp4_13::evt_brobot_appear) {
+    if (script == spm::sp4_13::brobot_appear_evt) {
       wii::os::OSReport("evtBrotherEntry\n");
       entry = evtBrotherEntry(brother, mod::parentOfBeginRPG, flags);
     } else {
@@ -1509,7 +1509,7 @@ namespace mod {
 
   spm::evtmgr::EvtEntry * newEvtEntryType(const spm::evtmgr::EvtScriptCode * script, u32 priority, u8 flags, u8 type) {
     spm::evtmgr::EvtEntry * entry;
-    if (script == spm::sp4_13::evt_brobot_appear) {
+    if (script == spm::sp4_13::brobot_appear_evt) {
       wii::os::OSReport("evtEntryType\n");
       entry = evtEntryType(mod::parentOfBeginRPG, priority, flags, type);
     } else {
@@ -1520,7 +1520,7 @@ namespace mod {
 
   s32 new_evt_inline_evt(spm::evtmgr::EvtEntry * entry) {
     wii::os::OSReport("%x\n", entry -> scriptStart);
-    if (entry -> scriptStart == spm::sp4_13::evt_mr_l_appear) {
+    if (entry -> scriptStart == spm::sp4_13::mr_l_appear_evt) {
       wii::os::OSReport("%x\n", entry -> scriptStart);
     }
     return evt_inline_evt(entry);
@@ -1596,7 +1596,7 @@ namespace mod {
   }
 
   void patchWangSpecial() {
-    spm::an2_08::wang_special_1_80def2c8[1] = peach_special;
+    spm::an2_08::lbl_80def2c8[1] = peach_special;
   }
 
   void hookEvent() {
