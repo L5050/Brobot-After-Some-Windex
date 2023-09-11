@@ -1625,7 +1625,6 @@ namespace mod {
     //writeBranchLink( & spm::an2_08::rpgHandleMenu, 0x1BC, chooseNewCharacterString);
     //writeBranchLink( & spm::an2_08::evt_rpg_calc_damage_to_enemy, 0x44, test);
     writeBranchLink( & spm::an2_08::evt_rpg_npctribe_handle, 0x94, test);
-    //writeWord( & spm::an2_08::evt_rpg_calc_damage_to_enemy, 0x44, 0x38800127);
     writeWord( & spm::an2_08::evt_rpg_npctribe_handle, 0xA0, 0x3B9C0004);
     writeWord( & spm::an2_08::evt_rpg_npctribe_handle, 0x8C, 0x3BA00018);
   }
