@@ -1006,8 +1006,7 @@ namespace mod {
   "<dkey><wait 250></dkey>\n"
   "<o>\n";
 
-  const char * peach_heal_success =
-  "<p>\n"
+  const char * peach_heal_success = "<p>\n"
   "Success!\n"
   "Peach heals 20 HP!\n"
   "<k>\n"
@@ -1016,7 +1015,7 @@ namespace mod {
   const char * grab_fp = "<p>\n"
   "Success!\n"
   "You stole 2 FP!\n"
-  "<dkey><wait 250></dkey>\n"
+  "<k>\n"
   "<o>\n";
 
   const char * peach_special = "Heal";
