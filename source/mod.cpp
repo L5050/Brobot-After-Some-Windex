@@ -1527,7 +1527,7 @@ namespace mod {
 
   spm::effdrv::EffEntry * newEffNiceEntry(double param_1, double param_2, double param_3, double param_4, int param_5) {
 
-    wii::os::OSReport("%d %d %d %d %d\n", param_1, param_2, param_3, param_4, param_5);
+    //wii::os::OSReport("%d %d %d %d %d\n", param_1, param_2, param_3, param_4, param_5);
     return effNiceEntry(param_1, param_2, param_3, param_4, param_5);
 
   }
