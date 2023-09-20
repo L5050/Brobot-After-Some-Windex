@@ -4,6 +4,7 @@
 
 #include <spm/rel/an.h>
 #include <spm/evtmgr.h>
+#include <spm/evt_ac.h>
 #include <spm/evt_msg.h>
 #include <spm/evt_mario.h>
 #include <spm/evt_pouch.h>
@@ -280,6 +281,9 @@ EVT_END()
 EVT_BEGIN(attack)
     USER_FUNC(spm::an2_08::evt_rpg_char_get, LW(10))
     USER_FUNC(spm::evt_msg::evt_msg_print_add_insert, 0, PTR("stg7_2_133_2_004"), LW(10))
+    USER_FUNC(spm::evt_ac::evt_ac_entry, PTR("ac"), 15)
+    USER_FUNC(spm::evt_ac::evt_ac_name_to_ptr, PTR("ac"), LW(10))
+    USER_FUNC(spm::evt_ac::evt_ac_delete, PTR("ac"))
     USER_FUNC(spm::evt_snd::evt_snd_sfxon_character, PTR("SFX_P_MARIO_JUMP1"), PTR("SFX_P_PEACH_JUMP1"), PTR("SFX_P_KOOPA_JUMP1"), PTR("SFX_P_LUIGI_JUMP1"))
     WAIT_MSEC(500)
     USER_FUNC(spm::evt_sub::evt_sub_random, 1000, LW(10))
