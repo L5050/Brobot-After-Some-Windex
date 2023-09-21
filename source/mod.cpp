@@ -3,6 +3,7 @@
 #include "scripting.cpp"
 
 #include <spm/system.h>
+#include <spm/acdrv.h>
 #include <spm/camdrv.h>
 #include <spm/spmario_snd.h>
 #include <spm/evtmgr.h>
@@ -28,6 +29,7 @@
 #include <spm/rel/sp4_13.h>
 USING(wii::mtx::Vec3)
 
+//credit to rainchus for helping me out with these ASM hooks :)
 extern "C" {
   char marioString[] = "Flip";
   char peachString[] = "Heal";
@@ -49,6 +51,21 @@ extern "C" {
   s32 test() {
     return 296;
   }
+
+  void setNewFloat();
+  asm
+  (
+    "floatValue:\n"
+    ".float 299\n"
+
+    ".global setNewFloat\n"
+    "setNewFloat:\n"
+        "lis 3, floatValue@ha\n"
+        "ori 3, 3, floatValue@l\n"
+        "lfs 1, 0x0000 (3)\n"
+        "blr\n"
+  );
+
   void getTribe();
   asm
     (
@@ -192,6 +209,7 @@ namespace mod {
   s32( * marioCalcDamageToEnemy)(s32 damageType, s32 tribeId);
   s32( * evt_inline_evt)(spm::evtmgr::EvtEntry * entry);
   void( * msgUnLoad)(s32 slot);
+  //void ( * dispEntry)(f32 z, s8 cameraId, s8 renderMode, spm::dispdrv::DispCallback * callback, void * callbackParam);
   const char * ( * msgSearch)(const char * msgName);
 
   const char fileName[] = {
@@ -1509,7 +1527,7 @@ namespace mod {
   spm::evtmgr::EvtEntry * newEvtEntryType(const spm::evtmgr::EvtScriptCode * script, u32 priority, u8 flags, u8 type) {
     spm::evtmgr::EvtEntry * entry;
     if (script == spm::sp4_13::brobot_appear_evt) {
-      wii::os::OSReport("evtEntryType\n");
+      //wii::os::OSReport("evtEntryType\n");
       entry = evtEntryType(mod::parentOfBeginRPG, priority, flags, type);
     } else {
       entry = evtEntryType(script, priority, flags, type);
@@ -1518,9 +1536,9 @@ namespace mod {
   }
 
   s32 new_evt_inline_evt(spm::evtmgr::EvtEntry * entry) {
-    wii::os::OSReport("%x\n", entry -> scriptStart);
+    //wii::os::OSReport("%x\n", entry -> scriptStart);
     if (entry -> scriptStart == spm::sp4_13::mr_l_appear_evt) {
-      wii::os::OSReport("%x\n", entry -> scriptStart);
+    //  wii::os::OSReport("%x\n", entry -> scriptStart);
     }
     return evt_inline_evt(entry);
   }
@@ -1538,6 +1556,15 @@ namespace mod {
       if (tribeId == 295) damage = damage + 4;
       return damage;
   }
+
+  /*void newDispEntry(f32 z, s8 cameraId, s8 renderMode, spm::dispdrv::DispCallback * callback, void * callbackParam) {
+    wii::os::OSReport("%f\n", z);
+    if (z == 601.1) {
+      dispEntry(299.0, cameraId, renderMode, callback, callbackParam);
+    } else {
+      dispEntry(z, cameraId, renderMode, callback, callbackParam);
+    }
+  }*/
 
   void newMsgUnload(s32 slot) {
     if (slot != 7) {
@@ -1587,13 +1614,6 @@ namespace mod {
     return 2;
   }
 
-  void nopTPL() {
-    writeWord( & spm::an2_08::rpg_screen_draw, 0x204, 0x60000000);
-    writeWord( & spm::an2_08::rpg_screen_draw, 0x208, 0x60000000);
-    writeWord( & spm::an2_08::rpg_screen_draw, 0x210, 0x60000000);
-    writeWord( & spm::an2_08::rpg_screen_draw, 0x310, 0x60000000);
-  }
-
   void patchWangSpecial() {
     spm::an2_08::lbl_80def2c8[1] = peach_special;
   }
@@ -1624,8 +1644,11 @@ namespace mod {
     //writeBranchLink( & spm::an2_08::rpgHandleMenu, 0x1BC, chooseNewCharacterString);
     //writeBranchLink( & spm::an2_08::evt_rpg_calc_damage_to_enemy, 0x44, test);
     writeBranchLink( & spm::an2_08::evt_rpg_npctribe_handle, 0x94, test);
+    writeBranchLink( & spm::acdrv::acMain, 0x49C, setNewFloat);
     writeWord( & spm::an2_08::evt_rpg_npctribe_handle, 0xA0, 0x3B9C0004);
     writeWord( & spm::an2_08::evt_rpg_npctribe_handle, 0x8C, 0x3BA00018);
+    writeWord( & spm::an2_08::evt_rpg_npctribe_handle, 0x2BC, 0x60000000);
+    //writeWord( & spm::acdrv::acMain, 0x49C, 0x60000000);
   }
 
   /*
