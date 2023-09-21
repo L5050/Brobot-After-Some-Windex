@@ -1712,7 +1712,8 @@ namespace mod {
 
   s32 osReportLW(spm::evtmgr::EvtEntry * evtEntry, bool firstRun) {
     spm::evtmgr::EvtVar * args = (spm::evtmgr::EvtVar *)evtEntry->pCurData;
-    wii::os::OSReport("%d\n", args[0]);
+    s32 lw = spm::evtmgr_cmd::evtGetValue(evtEntry, args[0]);
+    wii::os::OSReport("%d\n", lw);
     if (firstRun == false) {}
     return 2;
   }
