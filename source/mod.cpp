@@ -445,7 +445,8 @@ namespace mod {
   "<o>\n";
 
   const char * stg7_2_133_2_044 = "<p>\n"
-  "%s uses Cudge<wait 150> to attack %s!\n"
+  "%s uses Cudge\n"
+  "to attack %s!\n"
   "<dkey><wait 250></dkey>\n"
   "<o>\n";
 
