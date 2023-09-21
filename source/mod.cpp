@@ -209,7 +209,6 @@ namespace mod {
   s32( * marioCalcDamageToEnemy)(s32 damageType, s32 tribeId);
   s32( * evt_inline_evt)(spm::evtmgr::EvtEntry * entry);
   void( * msgUnLoad)(s32 slot);
-  //void ( * dispEntry)(f32 z, s8 cameraId, s8 renderMode, spm::dispdrv::DispCallback * callback, void * callbackParam);
   const char * ( * msgSearch)(const char * msgName);
 
   const char fileName[] = {
@@ -1557,15 +1556,6 @@ namespace mod {
       return damage;
   }
 
-  /*void newDispEntry(f32 z, s8 cameraId, s8 renderMode, spm::dispdrv::DispCallback * callback, void * callbackParam) {
-    wii::os::OSReport("%f\n", z);
-    if (z == 601.1) {
-      dispEntry(299.0, cameraId, renderMode, callback, callbackParam);
-    } else {
-      dispEntry(z, cameraId, renderMode, callback, callbackParam);
-    }
-  }*/
-
   void newMsgUnload(s32 slot) {
     if (slot != 7) {
       msgUnLoad(slot);
@@ -1719,6 +1709,14 @@ namespace mod {
     if (firstRun == false) {}
     return 2;
   }
+
+  s32 osReportLW(spm::evtmgr::EvtEntry * evtEntry, bool firstRun) {
+    spm::evtmgr::EvtVar * args = (spm::evtmgr::EvtVar *)evtEntry->pCurData;
+    wii::os::OSReport("%d\n", args[0]);
+    if (firstRun == false) {}
+    return 2;
+  }
+
 
   s32 rpg_off(spm::evtmgr::EvtEntry * evtEntry, bool firstRun) {
     rpgInProgress = false;
