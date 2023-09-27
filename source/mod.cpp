@@ -6,6 +6,7 @@
 #include <spm/acdrv.h>
 #include <spm/camdrv.h>
 #include <spm/spmario_snd.h>
+#include <spm/spmario.h>
 #include <spm/evtmgr.h>
 #include <spm/mario.h>
 #include <spm/evtmgr_cmd.h>
@@ -1020,13 +1021,13 @@ namespace mod {
 
   const char * peach_heal = "<p>\n"
   "Peach calls upon\n"
-  "mushroom magic...\n"
+  "the pure hearts...\n"
   "<dkey><wait 250></dkey>\n"
   "<o>\n";
 
   const char * peach_heal_success = "<p>\n"
   "Success!\n"
-  "Peach heals 20 HP!\n"
+  "Peach heals %d HP!\n"
   "<k>\n"
   "<o>\n";
 
@@ -1638,7 +1639,7 @@ namespace mod {
     writeBranchLink( & spm::acdrv::acMain, 0x49C, setNewFloat);
     writeWord( & spm::an2_08::evt_rpg_npctribe_handle, 0xA0, 0x3B9C0004);
     writeWord( & spm::an2_08::evt_rpg_npctribe_handle, 0x8C, 0x3BA00018);
-    writeWord( & spm::an2_08::evt_rpg_npctribe_handle, 0x2BC, 0x60000000);
+    //writeWord( & spm::an2_08::evt_rpg_npctribe_handle, 0x2BC, 0x60000000);
     //writeWord( & spm::acdrv::acMain, 0x49C, 0x60000000);
   }
 
@@ -1724,6 +1725,15 @@ namespace mod {
     rpgInProgress = false;
     if (firstRun == false) {}
     if (evtEntry->flags == 0) {}
+    return 2;
+  }
+
+  s32 calc_peach_heal(spm::evtmgr::EvtEntry * evtEntry, bool firstRun) {
+    spm::evtmgr::EvtVar * args = (spm::evtmgr::EvtVar *)evtEntry->pCurData;
+    s32 gsw = 5;
+    if (spm::spmario::gp->gsw0 >= 170) gsw = 20;
+    spm::evtmgr_cmd::evtSetValue(evtEntry, args[0], gsw);
+    if (firstRun == false) {}
     return 2;
   }
 
