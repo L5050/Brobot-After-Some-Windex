@@ -471,7 +471,8 @@ namespace mod {
 
   const char * stg7_2_133_2_048 = "<dkey><wait 250></dkey>\n"
   "<p>\n"
-  "%s gets tiny! Where did he go?!\n"
+  "%s gets tiny!\n"
+  "Where did he go?!\n"
   "<k>\n"
   "<o>\n";
 
@@ -1639,6 +1640,7 @@ namespace mod {
     writeBranchLink( & spm::acdrv::acMain, 0x49C, setNewFloat);
     writeWord( & spm::an2_08::evt_rpg_npctribe_handle, 0xA0, 0x3B9C0004);
     writeWord( & spm::an2_08::evt_rpg_npctribe_handle, 0x8C, 0x3BA00018);
+    writeWord(& spm::mario::marioCalcDamageToEnemy, 0x16C, 0x57FF003E);
     //writeWord( & spm::an2_08::evt_rpg_npctribe_handle, 0x2BC, 0x60000000);
     //writeWord( & spm::acdrv::acMain, 0x49C, 0x60000000);
   }
@@ -1740,7 +1742,7 @@ namespace mod {
   void patchBrobot() {
     spm::npcdrv::npcTribes[295].maxHp = 1;
     spm::npcdrv::npcTribes[295].killXp = 100;
-    spm::npcdrv::npcTribes[296].maxHp = 200;
+    spm::npcdrv::npcTribes[296].maxHp = 130;
   }
 
   void main() {
