@@ -49,9 +49,58 @@ extern "C" {
     296,
     0
   };
+
   s32 test() {
-    return 296;
+    return rpgTribeID[1];
   }
+// attempt at changing texture index
+  s32 returnTextureIndex() {
+    if (rpgTribeID[1] == 296) {
+      return 2;
+    }
+    return 0;
+  }
+
+  void setTextureIndex();
+  asm(
+  ".global setTextureIndex\n"
+  "setTextureIndex:\n"
+  "addi 1, 1, -0x40\n"
+  "stw 31, 0x0010 (1)\n"
+  "stw 30, 0x0014 (1)\n"
+  "stw 29, 0x0018 (1)\n"
+  "stw 28, 0x001C (1)\n"
+  "stw 27, 0x0020 (1)\n"
+  "stw 26, 0x0024 (1)\n"
+  "stw 25, 0x0028 (1)\n"
+  "stw 24, 0x002C (1)\n"
+  "stw 23, 0x0030 (1)\n"
+  "stw 22, 0x0034 (1)\n"
+  "stw 0, 0x0038 (1)\n"
+  "mflr 0\n"
+  "stw 0, 0x003C (1)\n"
+
+  "bl returnTextureIndex\n"
+
+  "lwz 31, 0x0010 (1)\n"
+  "lwz 30, 0x0014 (1)\n"
+  "lwz 29, 0x0018 (1)\n"
+  "lwz 28, 0x001C (1)\n"
+  "lwz 27, 0x0020 (1)\n"
+  "lwz 26, 0x0024 (1)\n"
+  "lwz 25, 0x0028 (1)\n"
+  "lwz 24, 0x002C (1)\n"
+  "lwz 23, 0x0030 (1)\n"
+  "lwz 22, 0x0034 (1)\n"
+  "lwz 0, 0x003C (1)\n"
+  "mtlr 0\n"
+  "lwz 0, 0x0038 (1)\n"
+
+  "mr 26, 3\n"
+  "addi 1, 1, 0x40\n"
+  "addi 3, 26, 0x4\n"
+  "blr\n"
+  );
 
   void setNewFloat();
   asm
@@ -1635,8 +1684,8 @@ namespace mod {
     msgSearch = patch::hookFunction(spm::msgdrv::msgSearch, newMsgSearch);
 
     //writeBranchLink( & spm::an2_08::rpgHandleMenu, 0x1BC, chooseNewCharacterString);
-    //writeBranchLink( & spm::an2_08::evt_rpg_calc_damage_to_enemy, 0x44, test);
     writeBranchLink( & spm::an2_08::evt_rpg_npctribe_handle, 0x94, test);
+    writeBranchLink( & spm::an2_08::rpg_screen_draw, 0x2D8, setTextureIndex);
     writeBranchLink( & spm::acdrv::acMain, 0x49C, setNewFloat);
     writeWord( & spm::an2_08::evt_rpg_npctribe_handle, 0xA0, 0x3B9C0004);
     writeWord( & spm::an2_08::evt_rpg_npctribe_handle, 0x8C, 0x3BA00018);
