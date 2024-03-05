@@ -56,7 +56,7 @@ extern "C" {
 // attempt at changing texture index
   s32 returnTextureIndex() {
     if (rpgTribeID[1] == 296) {
-      return 2;
+      return 1;
     }
     return 0;
   }
