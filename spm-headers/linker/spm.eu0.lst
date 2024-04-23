@@ -6,7 +6,8 @@
 // more
 
 /* Dol */
-
+8045B9E0:superDimentioHeadDefenses
+8045B9F8:superDimentioBodyDefenses
 
 // Runtime.PPCEABI.H.a
 // __mem.c
@@ -369,6 +370,7 @@
 8010cd88:evt_pouch_get_level
 8010ce04:evt_pouch_get_next_level_xp
 8010cffc:evt_pouch_increment_enemies_defeated
+8014f7c8:pouchGetCardCount
 
 // evt_seq.c
 8010d028:evt_seq_set_seq
@@ -400,10 +402,19 @@
 8014f080:pouchGetPixlInfo
 // text
 8014c088:pouchGetPtr
+8014d394:pouchSetAttack
+8014d3c8:pouchGetAttack
+8014d3d8:pouchAddAttack
+8014d414:pouchSetHp
 8014d458:pouchGetHp
 8014d468:pouchAddHp
+8014d4b4:pouchSetMaxHp
+8014d4e8:pouchGetMaxHp
 8014d4f8:pouchGetXp
 8014d508:pouchAddXp
+8014d548:pouchSetCoin
+8014d57c:pouchGetCoin
+8014d58c:pouchAddCoin
 8014d5f8:pouchAddItem
 8014dbf4:pouchCheckHaveItem
 8014df4c:pouchRemoveItem
