@@ -47,7 +47,7 @@ EVT_DECLARE_USER_FUNC(evt_npc_walk_to, 8)
 // evt_npc_jump_to(const char * name, f32 destX, f32 destY, f32 destZ, f32 height, s32 length)
 EVT_DECLARE_USER_FUNC(evt_npc_jump_to, 6)
 
-UNKNOWN_FUNCTION(func_801006fc);
+EVT_UNKNOWN_USER_FUNC(evt_npc_arc_to);
 UNKNOWN_FUNCTION(func_80100df8);
 UNKNOWN_FUNCTION(func_80101328);
 UNKNOWN_FUNCTION(func_8010144c);
@@ -58,9 +58,9 @@ UNKNOWN_FUNCTION(func_80101f48);
 UNKNOWN_FUNCTION(func_80102424);
 EVT_UNKNOWN_USER_FUNC(evt_npc_glide_to)
 EVT_UNKNOWN_USER_FUNC(func_80102bf8)
-UNKNOWN_FUNCTION(evt_npc_get_hp);
+EVT_UNKNOWN_USER_FUNC(evt_npc_get_hp)
 UNKNOWN_FUNCTION(evt_npc_get_max_hp);
-UNKNOWN_FUNCTION(evt_npc_set_hp);
+EVT_UNKNOWN_USER_FUNC(evt_npc_set_hp)
 
 // evt_npc_delete(const char * name)
 EVT_DECLARE_USER_FUNC(evt_npc_delete, 1)
@@ -77,11 +77,14 @@ EVT_DECLARE_USER_FUNC(evt_npc_add_flip_part, 1)
 EVT_DECLARE_USER_FUNC(evt_npc_set_anim, 3)
 UNKNOWN_FUNCTION(func_801031a0);
 UNKNOWN_FUNCTION(func_80103268);
-UNKNOWN_FUNCTION(evt_npc_get_cur_anim);
+
+// evt_npc_get_cur_anim(const char * name, s32 ret)
+EVT_DECLARE_USER_FUNC(evt_npc_get_cur_anim, 2);
+
 UNKNOWN_FUNCTION(evt_npc_search_anim_defs);
 
-// func_80103410(const char * npcName, s32 partId)
-EVT_DECLARE_USER_FUNC(func_80103410, 2)
+// evt_npc_wait_anim_end(const char * npcName, s32 partId)
+EVT_DECLARE_USER_FUNC(evt_npc_wait_anim_end, 2)
 
 UNKNOWN_FUNCTION(func_80103574);
 
@@ -89,7 +92,7 @@ UNKNOWN_FUNCTION(func_80103574);
 EVT_DECLARE_USER_FUNC(evt_npc_flag8_onoff, 3)
 
 UNKNOWN_FUNCTION(evt_npc_flagC_onoff);
-UNKNOWN_FUNCTION(evt_npc_flag46C_onoff);
+EVT_UNKNOWN_USER_FUNC(evt_npc_flag46C_onoff);
 UNKNOWN_FUNCTION(evt_npc_flag10_onoff);
 UNKNOWN_FUNCTION(evt_npc_part_flag_onoff);
 
@@ -100,7 +103,9 @@ UNKNOWN_FUNCTION(func_80103a44);
 UNKNOWN_FUNCTION(func_80103b40);
 UNKNOWN_FUNCTION(func_80103c24);
 UNKNOWN_FUNCTION(func_80103d20);
-UNKNOWN_FUNCTION(evt_npc_get_unitwork);
+
+// evt_npc_set_unitwork(const char * name, s32 idx, s32 ret)
+EVT_DECLARE_USER_FUNC(evt_npc_get_unitwork, 3);
 
 
 // evt_npc_set_unitwork(const char * name, s32 idx, s32 val)
@@ -118,7 +123,10 @@ UNKNOWN_FUNCTION(func_8010457c);
 UNKNOWN_FUNCTION(func_801045ac);
 UNKNOWN_FUNCTION(func_801045dc);
 UNKNOWN_FUNCTION(func_80104638);
-EVT_DECLARE_USER_FUNC(func_80104694, 2)
+
+// evt_npc_set_move_mode(const char * name, NPCMoveMode moveMode )
+EVT_DECLARE_USER_FUNC(evt_npc_set_move_mode, 2)
+
 UNKNOWN_FUNCTION(func_801046f4);
 UNKNOWN_FUNCTION(func_80104750);
 UNKNOWN_FUNCTION(func_801047ac);
@@ -161,7 +169,7 @@ UNKNOWN_FUNCTION(func_801058c8);
 // evt_npc_get_axis_movement_unit(const char * name, f32& ret)
 EVT_DECLARE_USER_FUNC(evt_npc_get_axis_movement_unit, 2)
 
-EVT_DECLARE_USER_FUNC(func_801059d0, 2)
+EVT_DECLARE_USER_FUNC(evt_npc_set_axis_movement_unit, 2)
 UNKNOWN_FUNCTION(func_80105a30);
 UNKNOWN_FUNCTION(func_80105b00);
 EVT_UNKNOWN_USER_FUNC(func_80105b94)
@@ -232,12 +240,16 @@ UNKNOWN_FUNCTION(func_8010874c);
 UNKNOWN_FUNCTION(func_801087d8);
 UNKNOWN_FUNCTION(func_80108930);
 UNKNOWN_FUNCTION(func_801089d0);
+EVT_DECLARE_USER_FUNC(evt_npc_wait_axis_movement_unit_end, 1)
 UNKNOWN_FUNCTION(func_80108a2c);
 UNKNOWN_FUNCTION(func_80108ac0);
 UNKNOWN_FUNCTION(func_80108b8c);
 UNKNOWN_FUNCTION(func_80108bd4);
 UNKNOWN_FUNCTION(func_80108cc0);
-UNKNOWN_FUNCTION(evt_npc_set_part_attack_power);
+
+// evt_npc_set_part_attack_power(const char * name, npcPartIndex, attackPower)
+EVT_DECLARE_USER_FUNC(evt_npc_set_part_attack_power, 3);
+
 UNKNOWN_FUNCTION(func_80108ebc);
 UNKNOWN_FUNCTION(func_80108f50);
 UNKNOWN_FUNCTION(func_80108fe4);
@@ -247,7 +259,7 @@ UNKNOWN_FUNCTION(func_801091e0);
 UNKNOWN_FUNCTION(func_80109250);
 UNKNOWN_FUNCTION(func_801092c0);
 UNKNOWN_FUNCTION(func_80109370);
-UNKNOWN_FUNCTION(func_801093e0);
+
 UNKNOWN_FUNCTION(func_80109434);
 UNKNOWN_FUNCTION(func_801094b4);
 UNKNOWN_FUNCTION(func_80109548);
@@ -276,7 +288,10 @@ UNKNOWN_FUNCTION(func_8010a1e8);
 UNKNOWN_FUNCTION(func_8010a298);
 UNKNOWN_FUNCTION(evt_npc_try_catch_card);
 UNKNOWN_FUNCTION(func_8010a37c);
-UNKNOWN_FUNCTION(func_8010a418);
+
+// evt_npc_wait_for(const char * name, s32 timeInMiliseconds)
+EVT_DECLARE_USER_FUNC(evt_npc_wait_for, 2)
+
 UNKNOWN_FUNCTION(func_8010a4ec);
 UNKNOWN_FUNCTION(func_8010a5ec);
 UNKNOWN_FUNCTION(func_8010a788);

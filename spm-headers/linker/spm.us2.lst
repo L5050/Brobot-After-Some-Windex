@@ -3,8 +3,6 @@
 800030c8:firstRel
 800030cc:lastRel
 
-8041D258:superDimentioHeadDefenses
-8041D270:superDimentioBodyDefenses
 // Automatically generated from spm.eu0.lst
 80004000:memcpy
 80004104:memset
@@ -294,7 +292,7 @@
 801029AC:evt_npc_entry
 80102AA4:func_80103054
 80102B58:evt_npc_set_anim
-801040E4:func_80104694
+801040E4:evt_npc_set_move_mode
 801030DC:evt_npc_flag8_onoff
 80103408:evt_npc_animflag_onoff
 801046E4:evt_npc_set_property
@@ -584,7 +582,7 @@
 8002F1E0:msgUnLoad
 8002EFB4:msgLoad
 1,1,31620:evt_an_init_tpl
-80107C38:evt_npc_get_position
+800FDBA8:evt_npc_get_position
 1,5,a8ccc:mr_l_appear_evt
 1,5,a9648:brobot_appear_evt
 8023950C:spsndSFXOn
@@ -593,7 +591,7 @@
 800D2D00:evt_snd_sfxon_npc_delay
 800E6778:evt_env_static_blur_on
 1,1,166e4:func_80c5c36c
-80102E60:func_80103410
+80102E60:evt_npc_wait_anim_end
 800E629C:evt_eff_softdelete
 800F2F78:evt_mario_set_anim_change_handler
 800FF65C:evt_npc_walk_to
@@ -636,7 +634,7 @@
 8056d570:SaveStart
 8056d574:SaveEnd
 
-// new to SPM-Hard-Mode
+// new to SPM-Hard-Mode: Rubies and Magic
 8014CCF8:pouchSetAttack
 8014CD2C:pouchGetAttack
 8014CD3C:pouchAddAttack
@@ -651,3 +649,61 @@
 8010380C:evt_npc_get_unitwork
 801038F8:evt_npc_set_unitwork
 800D8A60:make_jump_table
+8010284C:evt_npc_set_hp
+801026CC:evt_npc_get_hp
+8010278C:evt_npc_get_max_hp
+800D9A98:evtDelete
+8041D258:superDimentioHeadDefenses
+8041D270:superDimentioBodyDefenses
+800D8C80:evtmgrReInit
+803E8718:marioMotTbl
+803E3C30:saffronCookingScript
+803C1070:default_item_use_evt
+801548A0:marioStatusApplyStatuses
+8010814C:evt_npc_get_active_count
+80102648:func_80102bf8
+800FF37C:func_800ff8f8
+80107688:func_80107c38
+80104FA0:evt_npc_wait_flip_finished
+80104FF4:evt_npc_finish_flip_instant
+80105158:evt_npc_flip_to
+801051B8:evt_npc_flip
+
+// new to SPMMulti
+80179B10:seq_mapChangeInit
+801087E8:evt_npc_set_part_attack_power
+801C9324:func_801ca1a4
+80100180:evt_npc_arc_to
+801028B8:evt_npc_delete
+80109E68:evt_npc_wait_for
+80102D5C:evt_npc_get_cur_anim
+800DEF0C:evtGetFloat
+
+// 2023-09-02
+802960A0:IOS_OpenAsync
+802962D8:IOS_CloseAsync
+80296440:IOS_ReadAsync
+80296648:IOS_WriteAsync
+80296748:IOS_Write
+80296850:IOS_SeekAsync
+80296F7C:iosCreateHeap
+80296930:IOS_IoctlAsync
+80296CD4:IOS_IoctlvAsync
+80296DB8:IOS_Ioctlv
+802970AC:iosAlloc
+1,5,18fa8:mac_02_init_evt
+8056D450:errno
+8027564C:OSCreateThread
+80275610:OSYieldThread
+80275CB4:OSResumeThread
+802588e8:memcmp
+
+// new to april fools 2024
+800E63A4:evt_eff_exclamation_question
+800F1AD8:evt_mario_wait_anim
+80105420:evt_npc_set_axis_movement_unit
+80108E30:evt_npc_wait_axis_movement_unit_end
+803D0130:evt_cutscene_pure_heart
+8010CADC:evt_seq_mapchange
+800E7360:evt_set_transition
+800DA228:evt_lbl
