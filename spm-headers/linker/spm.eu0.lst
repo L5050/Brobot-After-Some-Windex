@@ -137,6 +137,7 @@
 // more
 
 // mapdrv.c
+8008c440:mapObjFlagOn
 8008cf30:mapGrpFlagOn
 8008d2fc:mapGrpFlagOff
 8008e11c:mapGrpFlag4On
@@ -373,9 +374,11 @@
 80104694:evt_npc_set_move_mode
 80104c94:evt_npc_set_property
 80104fac:evt_npc_modify_part
+8010508c:evt_npc_get_property
 80105550:evt_npc_wait_flip_finished
 801055A4:evt_npc_finish_flip_instant
 80105708:evt_npc_flip_to
+80105924:evt_npc_get_axis_movement_unit
 80105768:evt_npc_flip
 801059d0:func_801059d0
 801059D0:evt_npc_set_axis_movement_unit
@@ -392,6 +395,7 @@
 8010a418:evt_npc_wait_for
 8010a910:evt_npc_teleport_effect
 8010be80:evt_npc_tribe_agb_async
+801e59c4:evt_npc_dimen_determine_move_pos
 // more
 
 // not sure where you want this
@@ -545,6 +549,7 @@
 8019d254:irand
 8019c54c:__assert2
 8019cf84:qqsort
+8019c688:distABf
 // more
 
 // debug.c
@@ -682,8 +687,16 @@
 
 // npc_dimeen_l.c
 // data
+80457140:dimen_unk_fight_script_1
+80457190:dimen_unk_fight_script_2
+80459028:dimen_unk_fight_script_3
 8045B9E0:superDimentioHeadDefenses
 8045B9F8:superDimentioBodyDefenses
+//more
+
+// npc_ninja.c
+// data
+8021de00:ninjoe_bomb_calc_chance
 //more
 
 // wpadmgr.c

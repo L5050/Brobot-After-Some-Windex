@@ -37,6 +37,15 @@ typedef struct
 } NPCTribeAnimDef;
 SIZE_ASSERT(NPCTribeAnimDef, 0x8)
 
+typedef enum NPCMoveMode {
+    NPC_MOVE_WALK_NO_HIT=0,
+    NPC_MOVE_WALK=1,
+    NPC_MOVE_STAY_NO_DAMAGE=2,
+    NPC_MOVE_SPIN=3,
+    NPC_MOVE_WALK_NO_HIT_2=4
+} NPCMoveMode;
+SIZE_ASSERT(NPCMoveMode, 0x4)
+
 typedef struct
 {
 /* 0x00 */ u16 id;
@@ -152,7 +161,11 @@ typedef struct _NPCEntry
 /* 0x044 */ NPCAnim m_Anim; // unknown size
 /* ????? */ u8 unknown_unk[0x2a0 - 0x44 - sizeof(NPCAnim)];
 /* 0x2A0 */ Vec3 position;
-/* 0x2AC */ u8 unknown_0x2ac[0x348 - 0x2ac];
+/* 0x2AC */ u8 unknown_0x2ac[0x2ec - 0x2ac];
+/* 0x2EC */ s32 flippedTo3d;
+/* 0x2AC */ u8 unknown_0x2f0[0x2f8 - 0x2f0];
+/* 0x2F8 */ NPCMoveMode moveMode;
+/* 0x2FC */ u8 unknown_0x2fc[0x348 - 0x2fc];
 /* 0x348 */ EvtScriptCode * templateUnkScript1; // unkScript1 from spawning SetupEnemyTemplate
                                                 // (unknown for non-templated NPCs)
 /* 0x34C */ u8 unknown_0x34c[0x360 - 0x34c];
@@ -175,7 +188,9 @@ typedef struct _NPCEntry
 /* 0x380 */ u8 unknown_0x380[0x390 - 0x380];
 /* 0x390 */ s32 onSpawnEvtId; // id of the EvtEntry running a templated npc's onSpawn scripts
                               // (unknown for non-templated NPCs)
-/* 0x394 */ u8 unknown_0x394[0x39c - 0x394];
+/* 0x394 */ s32 unkEvtId;
+/* 0x398 */ u32 flags_398;
+/* 0x39c */ u8 unknown_0x39c[0x39c - 0x39c];
 /* 0x39C */ f32 tribeField0xE; // field 0xe of spawning NPCTribe cast to float
 /* 0x3A0 */ f32 tribeField0x10; // field 0x10 of spawning NPCTribe cast to float
 /* 0x3A4 */ f32 tribeField0x12; // field 0x12 of spawning NPCTribe cast to float
@@ -244,6 +259,11 @@ DECOMP_STATIC(NPCWork * npcdrv_wp)
 
 typedef bool (EnemyCanSpawnFunction)();
 
+struct NPCEntryUnkDef {
+    int type;
+    void *value;
+};
+
 typedef struct
 {
 /* 0x00 */ u8 unknown_0x0;
@@ -269,7 +289,7 @@ typedef struct
 /* 0x4C */ EvtScriptCode * unkScript7;
 /* 0x50 */ EvtScriptCode * unkScript8;
 /* 0x54 */ EvtScriptCode * unkScript9;
-/* 0x58 */ void * unknown_0x58;
+/* 0x58 */ NPCEntryUnkDef * unkDefinitionTable;
 /* 0x5C */ u8 unknown_0x5c[0x68 - 0x5c]; // all left blank to be copied from SetupEnemy
 } NPCEnemyTemplate;
 SIZE_ASSERT(NPCEnemyTemplate, 0x68)
