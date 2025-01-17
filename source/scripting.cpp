@@ -1638,8 +1638,6 @@ USER_FUNC(spm::evt_mario::evt_mario_key_off, 0)
     INLINE_EVT()
     USER_FUNC(spm::evt_env::evt_env_blur_on, 0, 500)
     END_INLINE()
-    USER_FUNC(spm::evt_fade::evt_fade_entry, 24, 500, 0, 0, 0, 255)
-    USER_FUNC(spm::evt_fade::evt_fade_end_wait, -1)
     RUN_CHILD_EVT(mod::beginRPG)
     IF_EQUAL(LW(0), 0) //only happens if you run away successfully
     WAIT_MSEC(500)

@@ -245,13 +245,6 @@ namespace mod {
   /*
       Various hooks
   */
-
-  spm::evtmgr::EvtEntry * ( * evtEntry1)(const spm::evtmgr::EvtScriptCode * script, u32 priority, u8 flags);
-  spm::evtmgr::EvtEntry * ( * evtChildEntry)(spm::evtmgr::EvtEntry * entry,
-    const spm::evtmgr::EvtScriptCode * script, u8 flags);
-  spm::evtmgr::EvtEntry * ( * evtBrotherEntry)(spm::evtmgr::EvtEntry * brother,
-    const spm::evtmgr::EvtScriptCode * script, u8 flags);
-  spm::evtmgr::EvtEntry * ( * evtEntryType)(const spm::evtmgr::EvtScriptCode * script, u32 priority, u8 flags, u8 type);
   spm::effdrv::EffEntry * ( * effNiceEntry)(double param_1, double param_2, double param_3, double param_4, int param_5);
   bool( * spsndBGMOn)(u32 flags,
     const char * name);
@@ -1538,61 +1531,6 @@ namespace mod {
 
   }
 
-  spm::evtmgr::EvtEntry * newEvtEntry(const spm::evtmgr::EvtScriptCode * script, u32 priority, u8 flags) {
-    spm::evtmgr::EvtEntry * entry;
-    //wii::os::OSReport("%x\n", script);
-    if (script == spm::sp4_13::brobot_appear_evt) {
-      wii::os::OSReport("evtEntry\n");
-      entry = evtEntry1(mod::parentOfBeginRPG, priority, flags);
-    } else {
-      entry = evtEntry1(script, priority, flags);
-    }
-    return entry;
-  }
-
-  spm::evtmgr::EvtEntry * newEvtChildEntry(spm::evtmgr::EvtEntry * entry,
-    const spm::evtmgr::EvtScriptCode * script, u8 flags) {
-    spm::evtmgr::EvtEntry * entry1;
-    if (script == spm::sp4_13::brobot_appear_evt) {
-      wii::os::OSReport("evtChildEntry\n");
-      //wii::os::OSReport("%x\n", entry -> scriptStart);
-      entry1 = evtChildEntry(entry, mod::parentOfBeginRPG, flags);
-    } else {
-      entry1 = evtChildEntry(entry, script, flags);
-    }
-    return entry1;
-  }
-
-  spm::evtmgr::EvtEntry * newEvtBrotherEntry(spm::evtmgr::EvtEntry * brother,
-    const spm::evtmgr::EvtScriptCode * script, u8 flags) {
-    spm::evtmgr::EvtEntry * entry;
-    if (script == spm::sp4_13::brobot_appear_evt) {
-      wii::os::OSReport("evtBrotherEntry\n");
-      entry = evtBrotherEntry(brother, mod::parentOfBeginRPG, flags);
-    } else {
-      entry = evtBrotherEntry(brother, script, flags);
-    }
-    return entry;
-  }
-
-  spm::evtmgr::EvtEntry * newEvtEntryType(const spm::evtmgr::EvtScriptCode * script, u32 priority, u8 flags, u8 type) {
-    spm::evtmgr::EvtEntry * entry;
-    if (script == spm::sp4_13::brobot_appear_evt) {
-      //wii::os::OSReport("evtEntryType\n");
-      entry = evtEntryType(mod::parentOfBeginRPG, priority, flags, type);
-    } else {
-      entry = evtEntryType(script, priority, flags, type);
-    }
-    return entry;
-  }
-
-  s32 new_evt_inline_evt(spm::evtmgr::EvtEntry * entry) {
-    //wii::os::OSReport("%x\n", entry -> scriptStart);
-    if (entry -> scriptStart == spm::sp4_13::mr_l_appear_evt) {
-    //  wii::os::OSReport("%x\n", entry -> scriptStart);
-    }
-    return evt_inline_evt(entry);
-  }
 
   spm::effdrv::EffEntry * newEffNiceEntry(double param_1, double param_2, double param_3, double param_4, int param_5) {
 
@@ -1603,6 +1541,10 @@ namespace mod {
 
   s32 newMarioCalcDamageToEnemy(s32 damageType, s32 tribeId) {
       wii::os::OSReport("%d, %d\n", damageType, tribeId);
+      if (rpgInProgress != true) {
+      rpgTribeID[1] = tribeId;
+      spm::evtmgr::evtEntry(parentOfBeginRPG, 1, 0);
+    }
       s32 damage = marioCalcDamageToEnemy(damageType, tribeId);
       if (tribeId == 295) damage = damage + 4;
       return damage;
@@ -1664,16 +1606,6 @@ namespace mod {
     patch::hookFunction(spm::an2_08::evt_rpg_calc_damage_to_enemy, new_evt_rpg_calc_damage_to_enemy);
     patch::hookFunction(spm::an2_08::evt_rpg_calc_mario_damage, new_evt_rpg_calc_mario_damage);
     patchWangSpecial();
-
-    evtEntry1 = patch::hookFunction(spm::evtmgr::evtEntry, newEvtEntry);
-
-    evtChildEntry = patch::hookFunction(spm::evtmgr::evtChildEntry, newEvtChildEntry);
-
-    evtBrotherEntry = patch::hookFunction(spm::evtmgr::evtBrotherEntry, newEvtBrotherEntry);
-
-    evtEntryType = patch::hookFunction(spm::evtmgr::evtEntryType, newEvtEntryType);
-
-    //evt_inline_evt = patch::hookFunction(spm::evtmgr_cmd::evt_inline_evt, new_evt_inline_evt);
 
     marioCalcDamageToEnemy = patch::hookFunction(spm::mario::marioCalcDamageToEnemy, newMarioCalcDamageToEnemy);
 
