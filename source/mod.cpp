@@ -22,9 +22,13 @@
 #include <spm/fontmgr.h>
 #include <spm/seqdrv.h>
 #include <spm/seqdef.h>
+#include <spm/system.h>
+#include <spm/filemgr.h>
+#include <spm/icondrv.h>
 #include <spm/wpadmgr.h>
 #include <wii/os/OSError.h>
 #include <wii/gx.h>
+#include <wii/tpl.h>
 #include <wii/mtx.h>
 #include <msl/string.h>
 #include <spm/rel/an2_08.h>
@@ -58,6 +62,32 @@ extern "C" {
     false,
     false
   };
+
+  void drawStuff() {
+    // Flower disp
+    const Vec3 fpVec = {-100.0, -200.0, 0.0};
+    spm::icondrv::iconDispGx(0.7, &fpVec, 4, 105);
+    // FP number disp
+    wii::gx::GXColor green = {
+      0,
+      255,
+      0,
+      255
+    };
+    f32 scale = 1.0;
+    char buffer [50];
+    sprintf(buffer, "%d", mod::fp);
+    const char * msg = buffer;
+    spm::fontmgr::FontDrawStart();
+    spm::fontmgr::FontDrawEdge();
+    spm::fontmgr::FontDrawColor( & green);
+    spm::fontmgr::FontDrawScale(scale);
+    spm::fontmgr::FontDrawNoiseOff();
+    spm::fontmgr::FontDrawRainbowColor();
+    f32 x = -((spm::fontmgr::FontGetMessageWidth(msg) * scale) / 2);
+    spm::fontmgr::FontDrawString(x+-60, -171.0, msg);
+    return;
+  }
 
   s32 returnTribe(s32 index) {
     asm("mr 3, 28");
@@ -119,11 +149,6 @@ namespace mod {
     seq_titleMainReal(wp);
   }
 
-  /*void drawStuff(s32 cameraId, void * param) {
-    const Vec3 fpVec = {-110.0, -200.0, 0.0};
-    spm::icondrv::iconDispGx(1.0, &fpVec, 4, 105);
-  }*/
-
     static void seq_gameMainOverride(spm::seqdrv::SeqWork * wp) {
     if (rpgInProgress == true) {
       wii::gx::GXColor green = {
@@ -144,8 +169,8 @@ namespace mod {
       spm::fontmgr::FontDrawRainbowColor();
       f32 x = -((spm::fontmgr::FontGetMessageWidth(msg) * scale) / 2);
       spm::fontmgr::FontDrawString(x+-50, -161.0, msg);
-        //spm::dispdrv::dispEntry(spm::camdrv::CAM_ID_2D, 2, 300.0, drawStuff, nullptr);
       }
+      /*
       if (rpgInProgress == true) {
         wii::gx::GXColor green = {
           0,
@@ -163,15 +188,15 @@ namespace mod {
         spm::fontmgr::FontDrawRainbowColorOff();
         f32 x = -((spm::fontmgr::FontGetMessageWidth(msg) * scale) / 2);
         spm::fontmgr::FontDrawString(x+-90, -161.0, msg);
-        }
+      }*/
       seq_gameMainReal(wp);
     }
 
   static void titleScreenCustomTextPatch() {
     seq_titleMainReal = spm::seqdef::seq_data[spm::seqdrv::SEQ_TITLE].main;
     spm::seqdef::seq_data[spm::seqdrv::SEQ_TITLE].main = & seq_titleMainOverride;
-    seq_gameMainReal = spm::seqdef::seq_data[spm::seqdrv::SEQ_GAME].main;
-    spm::seqdef::seq_data[spm::seqdrv::SEQ_GAME].main = & seq_gameMainOverride;
+    //seq_gameMainReal = spm::seqdef::seq_data[spm::seqdrv::SEQ_GAME].main;
+    //spm::seqdef::seq_data[spm::seqdrv::SEQ_GAME].main = & seq_gameMainOverride;
   }
 
   /*
@@ -1576,6 +1601,7 @@ static const char * getNpcName(s32 tribeId) {
     writeBranchLink( & spm::an2_08::rpgHandleMenu, 0x1BC, returnCharacterTechnique);
     writeBranchLink( & spm::an2_08::evt_rpg_npctribe_handle, 0x94, returnTribe);
     //writeBranchLink( & spm::an2_08::rpg_screen_draw, 0x2D8, setTextureIndex);
+    writeBranch( & spm::an2_08::rpg_screen_draw, 0x6F4, drawStuff);
     writeBranchLink( & spm::acdrv::acMain, 0x49C, setNewFloat);
     //writeWord( & spm::an2_08::evt_rpg_npctribe_handle, 0xA0, 0x3B9C0004);
     //writeWord( & spm::an2_08::evt_rpg_npctribe_handle, 0x8C, 0x3BA00018);
@@ -1739,11 +1765,34 @@ static const char * getNpcName(s32 tribeId) {
     spm::npcdrv::npcTribes[296].maxHp = 130;
   }
 
+  void patchTpl(u32 destId, u32 srcId, wii::tpl::TPLHeader *destTpl, wii::tpl::TPLHeader *srcTpl, const char *filePath = nullptr, bool free = false) {
+
+    // Loads the tpl if not already loaded by the stated filePath
+    if (srcTpl == nullptr){
+    spm::filemgr::FileEntry * srcFile = spm::filemgr::fileAllocf(4, filePath);
+    s32 tplSize = srcFile->length;
+    srcTpl = (wii::tpl::TPLHeader *)spm::memory::__memAlloc(spm::memory::Heap::HEAP_MAIN, tplSize);
+    msl::string::memcpy(srcTpl, srcFile->sp->data, tplSize);
+    spm::filemgr::fileFree(srcFile);
+    }
+
+    // Patches the destination tpl with the one given by the mod.rel
+    destTpl->imageTable[destId] = srcTpl->imageTable[srcId];
+
+    // Free the memory of the tpl loaded from mod.rel to prevent a leak
+    if (free == true){
+    spm::memory::__memFree(spm::memory::Heap::HEAP_MAIN, srcTpl);
+    }
+    return;
+  }
+
   void main() {
     wii::os::OSReport("SPM Rel Loader: the mod has ran!\n");
     titleScreenCustomTextPatch();
     hookEvent();
     patchBrobot();
+    wii::tpl::TPLHeader *myTplHeader = nullptr;
+    patchTpl(116, 0, (wii::tpl::TPLHeader *)spm::icondrv::icondrv_wp->wiconTpl->sp->data, myTplHeader, "./a/n_mg_flower-", true);
   }
 
 }

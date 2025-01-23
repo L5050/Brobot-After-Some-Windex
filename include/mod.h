@@ -7,6 +7,7 @@ namespace mod {
 
 #define MOD_VERSION "SPM-RPG-Battles"
 
+extern s32 fp;
 extern bool gIsDolphin;
 extern bool gIsRiivolution;
 extern bool gIsPatchedDisc;
