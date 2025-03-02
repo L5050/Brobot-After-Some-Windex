@@ -15,6 +15,9 @@ extern bool gIs4_3;
 extern bool succeededActionCommand;
 extern bool superGuard;
 
+s32 getRpgTribeID(s32 index);
+bool IsNpcActive(s32 index);
+
 void main();
 
 }

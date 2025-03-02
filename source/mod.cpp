@@ -1,5 +1,6 @@
 #include "mod.h"
 #include "patch.h"
+#include "npc_rpgdrv.h"
 #include "main_scripting.h"
 
 #include <spm/system.h>
@@ -224,9 +225,23 @@ static const char * getNpcName(s32 tribeId) {
     case 0:
       return "Goomba";
     break;
+    case 125:
+      return "Squiglet";
+    break;
+    case 309:
+      return "Super Dimentio";
+    break;
     default:
     return "yeet";
   }
+}
+
+s32 getRpgTribeID(s32 index) {
+  return rpgTribeID[index];
+}
+
+bool IsNpcActive(s32 index) {
+  return rpgIsActive[index];
 }
 
   const char * rpgStart = "Prepare for battle!\n"
@@ -1496,7 +1511,7 @@ static const char * getNpcName(s32 tribeId) {
 
   }
 
-  s32 newMarioCalcDamageToEnemy(s32 damageType, s32 tribeId) {
+  /*s32 newMarioCalcDamageToEnemy(s32 damageType, s32 tribeId) {
       wii::os::OSReport("%d, %d\n", damageType, tribeId);
       if (rpgInProgress != true) {
       rpgTribeID[1] = tribeId;
@@ -1505,7 +1520,7 @@ static const char * getNpcName(s32 tribeId) {
       s32 damage = marioCalcDamageToEnemy(damageType, tribeId);
       if (tribeId == 295) damage = damage + 4;
       return damage;
-  }
+  } */
 
   bool new_spsndBGMOn(u32 flags,
     const char * name) {
@@ -1553,11 +1568,32 @@ static const char * getNpcName(s32 tribeId) {
     spm::an2_08::lbl_80def2c8[1] = peach_special;
   }
 
+  static inline void setUpPreset(s32 tribeId) {
+    switch(tribeId)
+    {
+      case 0:
+        rpgIsActive[0] = true;
+        rpgIsActive[1] = true;
+        rpgIsActive[2] = true;
+        rpgTribeID[0] = 0;
+        rpgTribeID[1] = 309;
+        rpgTribeID[2] = 0;
+      break;
+      case 125:
+        rpgIsActive[0] = true;
+        rpgIsActive[1] = true;
+        rpgIsActive[2] = true;
+        rpgTribeID[0] = 0;
+        rpgTribeID[1] = 125;
+        rpgTribeID[2] = 0;
+      break;
+    }
+  }
+
   s32 turnBasedCombatOverrideFunc(spm::mario::MarioWork *marioWork, spm::npcdrv::NPCPart *npcPart, s32 lastAttackedDefenseType, s32 defenseType, s32 power, u8 param_6){
     s32 tribeId = npcPart->owner->tribeId;
     if (rpgInProgress != true) {
-    rpgTribeID[1] = tribeId;
-    rpgIsActive[1] = true;
+    setUpPreset(tribeId);
     spm::evtmgr::evtEntry(parentOfBeginRPG, 1, 0);
     spm::evtmgr::EvtEntry* entry = spm::evtmgr::evtEntry(deleteAttackedEnemy, 1, 0);
     entry->lw[0] = npcPart->owner->name;
@@ -1572,6 +1608,7 @@ static const char * getNpcName(s32 tribeId) {
     turnBasedCombatOverride[1].type = 0;
     turnBasedCombatOverride[1].value = nullptr;
     spm::npcdrv::npcEnemyTemplates[2].unkDefinitionTable = turnBasedCombatOverride;
+    spm::npcdrv::npcEnemyTemplates[250].unkDefinitionTable = turnBasedCombatOverride;
   }
 
   void deleteUnderchompTextures() {
@@ -1642,19 +1679,21 @@ static const char * getNpcName(s32 tribeId) {
   }
 
   s32 rpg_npc_setup(spm::evtmgr::EvtEntry * evtEntry, bool firstRun) {
-    spm::camdrv::camPtrTbl[5]->isOrthoToggle = 0;
+    spm::camdrv::camPtrTbl[5] -> isOrthoToggle = 0;
     for (int i = 0; i < 3; i++) {
-    spm::an2_08::an2_08_wp.rpgNpcInfo[i].attackStrength = spm::npcdrv::npcTribes[rpgTribeID[i]].attackStrength;
-    spm::an2_08::an2_08_wp.rpgNpcInfo[i].maxHp = spm::npcdrv::npcTribes[rpgTribeID[i]].maxHp;
-    spm::an2_08::an2_08_wp.rpgNpcInfo[i].killXp = spm::npcdrv::npcTribes[rpgTribeID[i]].killXp;
-    spm::an2_08::an2_08_wp.rpgNpcInfo[i].flags = 0;
-    spm::an2_08::an2_08_wp.rpgNpcInfo[i].unk_4 = 0;
-    spm::an2_08::an2_08_wp.rpgNpcInfo[i].unk_10 = 0xff;
-  }
+      if (rpgIsActive[i]) {
+        spm::an2_08::an2_08_wp.rpgNpcInfo[i].attackStrength = spm::npcdrv::npcTribes[rpgTribeID[i]].attackStrength;
+        spm::an2_08::an2_08_wp.rpgNpcInfo[i].maxHp = spm::npcdrv::npcTribes[rpgTribeID[i]].maxHp;
+        spm::an2_08::an2_08_wp.rpgNpcInfo[i].killXp = spm::npcdrv::npcTribes[rpgTribeID[i]].killXp;
+        spm::an2_08::an2_08_wp.rpgNpcInfo[i].flags = 0;
+        spm::an2_08::an2_08_wp.rpgNpcInfo[i].unk_4 = 0;
+        spm::an2_08::an2_08_wp.rpgNpcInfo[i].unk_10 = 0xff;
+      }
+    }
     rpgInProgress = true;
     fp = 5;
     if (firstRun == false) {}
-    if (evtEntry->flags == 0) {}
+    if (evtEntry -> flags == 0) {}
     return 2;
   }
 
@@ -1793,6 +1832,7 @@ static const char * getNpcName(s32 tribeId) {
     patchBrobot();
     wii::tpl::TPLHeader *myTplHeader = nullptr;
     patchTpl(116, 0, (wii::tpl::TPLHeader *)spm::icondrv::icondrv_wp->wiconTpl->sp->data, myTplHeader, "./a/n_mg_flower-", true);
+    npc_rpgdrv_main();
   }
 
 }

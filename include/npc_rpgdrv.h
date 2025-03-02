@@ -43,7 +43,7 @@
 using namespace spm::npcdrv;
 using namespace spm::evtmgr;
 
-#define NPC_TABLE_MAX 1
+#define NPC_TABLE_MAX 2
 
 namespace mod {
 
@@ -57,7 +57,10 @@ typedef struct
   EvtScriptCode* deathScript;
 } npc_rpg_data;
 
-extern npc_rpg_data npcDataTable[NPC_TABLE_MAX];
 extern NPCTribeAnimDef animsKuribo[];
+
+EVT_DECLARE_USER_FUNC(get_rpg_enemy_info, 3)
+
+void npc_rpgdrv_main();
 
 }
