@@ -1,5 +1,6 @@
 #include "mod.h"
 #include "patch.h"
+#include "evtpatch.h"
 #include "npc_rpgdrv.h"
 #include "main_scripting.h"
 
@@ -1827,7 +1828,8 @@ bool IsNpcActive(s32 index) {
 
   void main() {
     wii::os::OSReport("SPM Rel Loader: the mod has ran!\n");
-    titleScreenCustomTextPatch();
+    //titleScreenCustomTextPatch();
+    evtpatch::evtmgrExtensionInit();
     hookEvent();
     patchBrobot();
     wii::tpl::TPLHeader *myTplHeader = nullptr;
