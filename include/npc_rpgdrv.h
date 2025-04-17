@@ -43,22 +43,23 @@
 using namespace spm::npcdrv;
 using namespace spm::evtmgr;
 
-#define NPC_TABLE_MAX 2
+#define NPC_TABLE_MAX 3
 
 namespace mod {
 
 typedef struct
 {
   s32 tribeId;
-  s32 templateId;
   NPCTribeAnimDef* animDefs;
   EvtScriptCode* attackScript;
   EvtScriptCode* onHitScript;
   EvtScriptCode* deathScript;
+  const char * battle_script = nullptr;
 } npc_rpg_data;
 
 extern NPCTribeAnimDef animsKuribo[];
 
+EVT_DECLARE_USER_FUNC(get_rpg_enemy_attack_script, 2)
 EVT_DECLARE_USER_FUNC(get_rpg_enemy_info, 3)
 
 void npc_rpgdrv_main();

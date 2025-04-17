@@ -1597,6 +1597,14 @@ bool IsNpcActive(s32 index) {
         rpgTribeID[1] = 125;
         rpgTribeID[2] = 0;
       break;
+      case 529: // Doopliss
+        rpgIsActive[0] = false;
+        rpgIsActive[1] = true;
+        rpgIsActive[2] = false;
+        rpgTribeID[0] = 0;
+        rpgTribeID[1] = 529;
+        rpgTribeID[2] = 0;
+      break;
     }
   }
 
@@ -1844,6 +1852,7 @@ bool IsNpcActive(s32 index) {
     wii::tpl::TPLHeader *myTplHeader = nullptr;
     patchTpl(116, 0, (wii::tpl::TPLHeader *)spm::icondrv::icondrv_wp->wiconTpl->sp->data, myTplHeader, "./a/n_mg_flower-", true);
     npc_rpgdrv_main();
+    bringle_main();
   }
 
 }

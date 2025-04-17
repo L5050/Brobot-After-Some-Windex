@@ -19,6 +19,7 @@ s32 getRpgTribeID(s32 index);
 bool IsNpcActive(s32 index);
 spm::evtmgr::EvtScriptCode* getInstructionEvtArg(spm::evtmgr::EvtScriptCode* script, s32 line, int instruction);
 
+void bringle_main();
 void main();
 
 }

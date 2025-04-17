@@ -3,6 +3,7 @@
 #include "patch.h"
 #include "main_scripting.h"
 #include "npc_rpgdrv.h"
+#include "doopliss.h"
 
 #include <spm/rel/an.h>
 #include <spm/evtmgr.h>
@@ -84,6 +85,15 @@ NPCTribeAnimDef animsKuribo[] = {
     return 0;
   }
 
+  s32 get_rpg_enemy_attack_script(spm::evtmgr::EvtEntry * evtEntry, bool firstRun)
+  {
+    spm::evtmgr::EvtVar * args = (spm::evtmgr::EvtVar *)evtEntry->pCurData;
+    s32 tribeId = getRpgTribeID(args[0]);
+    s32 index = getDataTableIndex(tribeId);
+    spm::evtmgr_cmd::evtSetValue(evtEntry, args[1], (s32)npcDataTable[index].attackScript);
+    return 2;
+  }
+
   s32 get_rpg_enemy_info(spm::evtmgr::EvtEntry * evtEntry, bool firstRun)
   {
     spm::evtmgr::EvtVar * args = (spm::evtmgr::EvtVar *)evtEntry->pCurData;
@@ -101,8 +111,8 @@ NPCTribeAnimDef animsKuribo[] = {
       return 2;
     }
     s32 index = getDataTableIndex(tribeId);
-    spm::evtmgr_cmd::evtSetValue(evtEntry, args[1], npcDataTable[index].animDefs);
-    spm::evtmgr_cmd::evtSetValue(evtEntry, args[2], npcTribes[tribeId].animPoseName);
+    spm::evtmgr_cmd::evtSetValue(evtEntry, args[1], (s32)npcDataTable[index].animDefs);
+    spm::evtmgr_cmd::evtSetValue(evtEntry, args[2], (s32)npcTribes[tribeId].animPoseName);
 
     if (firstRun == false) {}
     return 2;
@@ -110,8 +120,11 @@ NPCTribeAnimDef animsKuribo[] = {
 
   void npc_rpgdrv_main()
   {
-    npcDataTable[0] = {0, 2, animsKuribo, nullptr, nullptr, nullptr};
-    npcDataTable[1] = {125, 250, animsOcta2, nullptr, nullptr, nullptr};
+    npcDataTable[0] = {0, animsKuribo, nullptr, nullptr, nullptr};
+    npcDataTable[1] = {125, animsOcta2, nullptr, nullptr, nullptr};
+    NPCTribeAnimDef * animsDoopliss = getDooplissAnims();
+    doopliss_main();
+    npcDataTable[2] = {529, animsDoopliss, nullptr, nullptr, nullptr}; // Doopliss
   }
 
 }

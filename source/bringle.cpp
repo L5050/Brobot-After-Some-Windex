@@ -123,8 +123,6 @@ s32 check_pressed_b_ac(spm::evtmgr::EvtEntry * evtEntry, bool firstRun) {
     EVT_BEGIN(hampter2)
     USER_FUNC(check_pressed_b_ac)
     USER_FUNC(spm::evt_mario::evt_mario_get_pos, LW(0), LW(1), LW(2))
-    USER_FUNC(spm::evt_npc::evt_npc_entry, PTR("doopliss"), PTR("c_ranpel"), 0)
-    USER_FUNC(spm::evt_npc::evt_npc_set_position, PTR("doopliss"), LW(0), LW(1), LW(2))
     USER_FUNC(check_pressed_b_ac)
     USER_FUNC(patchAsserts)
     USER_FUNC(spm::evt_npc::evt_npc_tribe_agb_async, 44)
@@ -611,7 +609,7 @@ USER_FUNC(spm::evt_npc::evt_npc_set_position, LW(10), FLOAT(0.0), LW(1), FLOAT(0
 /*
     General mod functions
 */
-void main()
+void bringle_main()
 {
     wii::os::OSReport("SPM Rel Loader: the mod has ran!\n");
     //titleScreenCustomTextPatch();
