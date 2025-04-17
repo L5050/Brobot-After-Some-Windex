@@ -2,7 +2,7 @@
 
 #include <common.h>
 #include "evt_cmd.h"
-
+#include "spm/evtmgr.h"
 namespace mod {
 
 #define MOD_VERSION "SPM-RPG-Battles"
@@ -17,6 +17,7 @@ extern bool superGuard;
 
 s32 getRpgTribeID(s32 index);
 bool IsNpcActive(s32 index);
+spm::evtmgr::EvtScriptCode* getInstructionEvtArg(spm::evtmgr::EvtScriptCode* script, s32 line, int instruction);
 
 void main();
 

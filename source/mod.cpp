@@ -217,6 +217,15 @@ namespace mod {
     "stg7"
   };
 
+  spm::evtmgr::EvtScriptCode* getInstructionEvtArg(spm::evtmgr::EvtScriptCode* script, s32 line, int instruction)
+  {
+    spm::evtmgr::EvtScriptCode* link = evtpatch::getEvtInstruction(script, line);
+    wii::os::OSReport("%p\n", link);
+    spm::evtmgr::EvtScriptCode* arg = evtpatch::getInstructionArgv(link)[instruction];
+    wii::os::OSReport("%p\n", arg);
+    return arg;
+  }
+
   /*
       Custom Text
   */
