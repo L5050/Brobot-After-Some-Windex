@@ -690,6 +690,18 @@
 800ECDD8:evt_item_entry
 800ed02c:evt_item_flag_onoff
 800ed280:evt_item_wait_collected
+80161D98:boomerFuseMain
+8010C2D4:evt_pouch_set_coins
+800D7ACC:evt_sub_item_select_menu
+800EFDF8:evt_mario_get_height
+801C7CC4:npcFleeped
+80107F4C:npc_dimeen_l_box_deal_damage
+801B26CC:throwDamage
+800FEEF4:evt_npc_set_rgba
+8010C304:evt_pouch_get_coins
+801c58dc:npcTakeDamage
+800FB15C:evt_mobj_save_blk
+801C1424:npcGetMaxEntries
 
 // new to SPMMulti
 80179B10:seq_mapChangeInit
