@@ -91,6 +91,7 @@ NPCTribeAnimDef animsKuribo[] = {
     s32 tribeId = getRpgTribeID(args[0]);
     s32 index = getDataTableIndex(tribeId);
     spm::evtmgr_cmd::evtSetValue(evtEntry, args[1], (s32)npcDataTable[index].attackScript);
+    wii::os::OSReport("Getting attack script\n");
     return 2;
   }
 
@@ -124,7 +125,7 @@ NPCTribeAnimDef animsKuribo[] = {
     npcDataTable[1] = {125, animsOcta2, nullptr, nullptr, nullptr};
     NPCTribeAnimDef * animsDoopliss = getDooplissAnims();
     doopliss_main();
-    npcDataTable[2] = {529, animsDoopliss, nullptr, nullptr, nullptr}; // Doopliss
+    npcDataTable[2] = {529, animsDoopliss, doopliss_attack, nullptr, nullptr}; // Doopliss
   }
 
 }

@@ -119,10 +119,12 @@ char * returnCharacterTechnique() {
 namespace mod {
   bool rpgInProgress = false;
   bool bossFight = false;
+  bool screenOn = true;
   bool succeededActionCommand = false;
   bool superGuard = false;
   spm::npcdrv::NPCEntryUnkDef turnBasedCombatOverride[2];
   s32 fp = 0;
+  wii::tpl::TPLHeader *myTplHeader = nullptr;
 
   /*
       Title Screen Custom Text
@@ -211,6 +213,7 @@ namespace mod {
   s32( * marioCalcDamageToEnemy)(s32 damageType, s32 tribeId);
   s32( * evt_inline_evt)(spm::evtmgr::EvtEntry * entry);
   void( * msgUnLoad)(s32 slot);
+  void( * rpg_screen_draw)();
   const char * ( * msgSearch)(const char * msgName);
 
   const char fileName[] = {
@@ -237,6 +240,9 @@ static const char * getNpcName(s32 tribeId) {
     break;
     case 125:
       return "Squiglet";
+    break;
+    case 529:
+      return "Doopliss";
     break;
     case 309:
       return "Super Dimentio";
@@ -1513,6 +1519,24 @@ bool IsNpcActive(s32 index) {
 
   }
 
+  s32 compareStrings(spm::evtmgr::EvtEntry *evtEntry, bool firstRun)
+    {
+        spm::evtmgr::EvtVar *args = (spm::evtmgr::EvtVar *)evtEntry->pCurData;
+        char *mapName = spm::evtmgr_cmd::evtGetValue(evtEntry, args[0]);
+        wii::os::OSReport("%s name\n", mapName);
+        char *comparison = spm::evtmgr_cmd::evtGetValue(evtEntry, args[1]);
+        int compstrReturn = 1;
+        char *result = msl::string::strstr(mapName, comparison);
+        if (result != 0)
+        {
+            compstrReturn = 1;
+        } else
+        {
+            compstrReturn = 0;
+        }
+        spm::evtmgr_cmd::evtSetValue(evtEntry, args[2], compstrReturn);
+        return 2;
+      }
 
   spm::effdrv::EffEntry * newEffNiceEntry(double param_1, double param_2, double param_3, double param_4, int param_5) {
 
@@ -1612,7 +1636,8 @@ bool IsNpcActive(s32 index) {
     s32 tribeId = npcPart->owner->tribeId;
     if (rpgInProgress != true) {
     setUpPreset(tribeId);
-    spm::evtmgr::evtEntry(parentOfBeginRPG, 1, 0);
+    spm::evtmgr::EvtEntry* battle = spm::evtmgr::evtEntry(parentOfBeginRPG, 1, 0);
+    battle->lw[0] = 1;
     spm::evtmgr::EvtEntry* entry = spm::evtmgr::evtEntry(deleteAttackedEnemy, 1, 0);
     entry->lw[0] = npcPart->owner->name;
     return 1;
@@ -1640,9 +1665,18 @@ bool IsNpcActive(s32 index) {
     writeWord( & spm::an2_08::rpg_screen_draw, 0x310, 0x60000000);
   }
 
+  void new_rpg_screen_draw()
+  {
+    if (screenOn)
+    {
+      rpg_screen_draw();
+    }
+  }
+
   void hookEvent() {
     patch::hookFunction(spm::an2_08::evt_rpg_calc_damage_to_enemy, new_evt_rpg_calc_damage_to_enemy);
     patch::hookFunction(spm::an2_08::evt_rpg_calc_mario_damage, new_evt_rpg_calc_mario_damage);
+    rpg_screen_draw = patch::hookFunction(spm::an2_08::rpg_screen_draw, new_rpg_screen_draw);
     patchWangSpecial();
 
     //marioCalcDamageToEnemy = patch::hookFunction(spm::mario::marioCalcDamageToEnemy, newMarioCalcDamageToEnemy);
@@ -1710,8 +1744,24 @@ bool IsNpcActive(s32 index) {
     }
     rpgInProgress = true;
     fp = 5;
+    patchTpl(116, 0, (wii::tpl::TPLHeader *)spm::icondrv::icondrv_wp->wiconTpl->sp->data, myTplHeader, "./a/n_mg_flower-", false);
     if (firstRun == false) {}
     if (evtEntry -> flags == 0) {}
+    return 2;
+  }
+
+  s32 start_boss_fight(spm::evtmgr::EvtEntry * evtEntry, bool firstRun)
+  {
+    spm::evtmgr::EvtVar * args = (spm::evtmgr::EvtVar *)evtEntry->pCurData;
+    setUpPreset(args[0]);
+    spm::evtmgr::evtEntry(parentOfBeginRPG, 1, 0);
+    return 2;
+  }
+
+  s32 enable_disable_rpg_menu(spm::evtmgr::EvtEntry * evtEntry, bool firstRun)
+  {
+    spm::evtmgr::EvtVar * args = (spm::evtmgr::EvtVar *)evtEntry->pCurData;
+    screenOn = args[0];
     return 2;
   }
 
@@ -1782,6 +1832,18 @@ bool IsNpcActive(s32 index) {
     return 2;
   }
 
+  s32 check_pressed_b_ac(spm::evtmgr::EvtEntry * evtEntry, bool firstRun) {
+    spm::evtmgr::EvtVar * args = (spm::evtmgr::EvtVar *)evtEntry->pCurData;
+    u32 pressed = spm::wpadmgr::wpadGetButtonsPressed(0);
+    if (pressed & 0x400) {
+      wii::os::OSReport("Succeeded action command!\n");
+      spm::evtmgr_cmd::evtSetValue(evtEntry, args[0], 1);
+    } else {
+      spm::evtmgr_cmd::evtSetValue(evtEntry, args[0], 0);
+    }
+    return 2;
+  }
+
   s32 check_ac_success(spm::evtmgr::EvtEntry * evtEntry, bool firstRun) {
     spm::evtmgr::EvtVar * args = (spm::evtmgr::EvtVar *)evtEntry->pCurData;
     if (succeededActionCommand == true) {
@@ -1801,8 +1863,28 @@ bool IsNpcActive(s32 index) {
     return 2;
   }
 
+  s32 superguard_toggle(spm::evtmgr::EvtEntry * evtEntry, bool firstRun) {
+    if (superGuard == false) {
+      superGuard = true;
+    } else {
+      superGuard = false;
+    }
+  return 2;
+}
+
+s32 check_superguard_success(spm::evtmgr::EvtEntry * evtEntry, bool firstRun) {
+  spm::evtmgr::EvtVar * args = (spm::evtmgr::EvtVar *)evtEntry->pCurData;
+  if (superGuard == true) {
+    spm::evtmgr_cmd::evtSetValue(evtEntry, args[0], 1);
+  } else {
+    spm::evtmgr_cmd::evtSetValue(evtEntry, args[0], 0);
+  }
+  return 2;
+}
+
   s32 ac_success_reset(spm::evtmgr::EvtEntry * evtEntry, bool firstRun) {
     succeededActionCommand = false;
+    superGuard = false;
     return 2;
   }
 
@@ -1849,8 +1931,6 @@ bool IsNpcActive(s32 index) {
     evtpatch::evtmgrExtensionInit();
     hookEvent();
     patchBrobot();
-    wii::tpl::TPLHeader *myTplHeader = nullptr;
-    patchTpl(116, 0, (wii::tpl::TPLHeader *)spm::icondrv::icondrv_wp->wiconTpl->sp->data, myTplHeader, "./a/n_mg_flower-", true);
     npc_rpgdrv_main();
     bringle_main();
   }

@@ -53,7 +53,9 @@ NPCTribeAnimDef animsDoopliss[] = {
     {6, "A_1A"},
     {7, "A_1B"},
     {8, "A_2"},
-    {11, "A_3"},
+    {9, "A_3"},
+    {10, "J_1A"},
+    {11, "J_1B"},
     {-1, nullptr}
   };
 
@@ -70,15 +72,329 @@ NPCTribeAnimDef animsDoopliss[] = {
     return animsDoopliss;
   }
 
+  const char * tippi_wtf = "<p><fairy>\n"
+  "Where... are we?\n"
+  "How did we even get here?\n"
+  "<k>\n";
+
+  const char * kansyu_wtf = "<p>\n"
+  "Hm... I recognize you.\n"
+  "<wait 150>You're Mario. We've met\n"
+  "in a previous adventure.\n"
+  "<k>\n"
+  "<p>\n"
+  "Do you recognize me?\n"
+  "<wait 150>Guess, whats my name?\n"
+  "<wait 150>Hit me with your best shot!\n"
+  "<k>\n";
+
+  const char * kansyu_no_response = "<p>\n"
+  "Speechless?\n"
+  "<wait 150>Come on, whats my name?\n"
+  "<wait 150>Hit me with your best shot!\n"
+  "<k>\n";
+
+  const char * kansyu_questioning = "<p>\n"
+  "%s?\n"
+  "<k>\n";
+
+  const char * doopliss_nope = "<p>\n"
+  "Wrongamundo little Mario!\n"
+  "Who'd name their kid that?\n"
+  "<k>\n"
+  "<p>\n"
+  "Long time no see, slick.\n"
+  "<wait 150>I see you were tricked by\n"
+  "Mimi as well.\n"
+  "<k>\n"
+  "<p>\n"
+  "I must flee this place before she\n"
+  "traps me again, but I wouldn't be\n"
+  "against some trickery first...\n"
+  "<k>\n";
+
+  const char * doopliss_yup = "<p>\n"
+  "Correct!\n"
+  "Your eyes have gotten sharper\n"
+  "since I saw you last.\n"
+  "<k>\n"
+  "<p>\n"
+  "Long time no see, slick.\n"
+  "<wait 150>I see you were tricked by\n"
+  "Mimi as well.\n"
+  "<k>\n"
+  "<p>\n"
+  "I must flee this place before she\n"
+  "traps me again, but I wouldn't be\n"
+  "against some trickery first...\n"
+  "<k>\n";
+
+  const char * superguard = "<p>\n"
+  "%s superguarded!"
+  "<k>\n";
+
   EVT_BEGIN(doopliss_cutscene)
+  USER_FUNC(spm::evt_mario::evt_mario_key_off, 1)
+  WAIT_MSEC(2000)
+  USER_FUNC(spm::evt_msg::evt_msg_print, 1, PTR(tippi_wtf), 0, PTR("__guide__"))
+  INLINE_EVT()
+  USER_FUNC(spm::evt_mario::evt_mario_walk_to, FLOAT(50.0), FLOAT(0.0), 2000)
+  END_INLINE()
+  USER_FUNC(spm::evt_cam::evt_cam3d_evt_zoom_in, 1, 100, EVT_NULLPTR, EVT_NULLPTR, 100, EVT_NULLPTR, EVT_NULLPTR, 2000, 11)
+  WAIT_MSEC(2500)
+  USER_FUNC(spm::evt_msg::evt_msg_print, 1, PTR(kansyu_wtf), 0, PTR("kansyu"))
+  LBL(1)
+  USER_FUNC(spm::evt_fade::evt_fade_entry, 2, 300, 0, 0, 0, 255)
+  USER_FUNC(spm::evt_fade::evt_fade_end_wait, -1)
+  USER_FUNC(spm::evt_map::evt_mapdisp_onoff, 0)
+  USER_FUNC(spm::evt_sub::func_800d8700, LW(0))
+  USER_FUNC(spm::evt_map::evt_mapdisp_onoff, 1)
+  USER_FUNC(spm::evt_fade::evt_fade_entry, 1, 300, 0, 0, 0, 255)
+  USER_FUNC(spm::evt_fade::evt_fade_end_wait, -1)
+  IF_EQUAL(LW(0), 0)
+    USER_FUNC(spm::evt_msg::evt_msg_print, 1, PTR(kansyu_no_response), 0, PTR("kansyu"))
+    GOTO(1)
+  END_IF()
+  USER_FUNC(spm::evt_msg::evt_msg_print_insert, 1, PTR(kansyu_questioning), 0, PTR("kansyu"), LW(0))
+  USER_FUNC(compareStrings, LW(0), PTR("Doopliss"), LW(0))
+  USER_FUNC(spm::evt_cam::evt_cam3d_evt_zoom_in, 1, 100, EVT_NULLPTR, EVT_NULLPTR, 100, EVT_NULLPTR, 175, 1000, 11)
+  USER_FUNC(spm::evt_snd::evt_snd_bgmoff_f_d, 0, 1000)
+  WAIT_MSEC(1000)
+  USER_FUNC(spm::evt_snd::evt_snd_sfxon, PTR("SFX_F_BOMB_FIRE1"))
+  USER_FUNC(spm::evt_eff::evt_eff, 0, PTR("kemuri_test"), 0, 125, 0, 10, FLOAT(5.0), 0, 0, 0, 0, 0, 0, 0)
+  USER_FUNC(evt_npc_set_position, PTR("kansyu"), 125, -100, 0)
+  USER_FUNC(evt_npc_set_position, PTR("doopliss"), 125, -2, 0)
+  USER_FUNC(evt_npc_set_property, PTR("doopliss"), 14, (s32)animsDoopliss)
+  USER_FUNC(evt_npc_set_anim, PTR("doopliss"), 0, 1)
+  IF_EQUAL(LW(0), 0)
+    USER_FUNC(spm::evt_msg::evt_msg_print, 1, PTR(doopliss_nope), 0, PTR("doopliss"))
+  ELSE()
+    USER_FUNC(spm::evt_msg::evt_msg_print, 1, PTR(doopliss_yup), 0, PTR("doopliss"))
+  END_IF()
+  USER_FUNC(spm::evt_snd::evt_snd_bgmon, 0, PTR("BGM_EVT_RELAXATION1"))
+  USER_FUNC(spm::evt_pouch::evt_pouch_set_attack, 1)
+  USER_FUNC(start_boss_fight, 529)
+  WAIT_MSEC(800)
+  USER_FUNC(spm::evt_npc::evt_npc_set_position, PTR("doopliss"), 0, -100, 0)
+  RETURN()
+  EVT_END()
+
+  EVT_BEGIN(hampter_room_init)
+    USER_FUNC(spm::evt_snd::evt_snd_bgmon, 0, PTR("BGM_MAP_STG2"))
+    USER_FUNC(spm::evt_mario::evt_mario_set_character, 0)
+    //USER_FUNC(spm::evt_snd::evt_snd_bgmon, 0, PTR("BGM_EVT_RELAXATION1"))
     RUN_CHILD_EVT(spm::evt_door::door_init_evt)
     USER_FUNC(evt_npc_entry, PTR("kansyu"), PTR("n_stg2_kansyu"), 0)
-    USER_FUNC(evt_npc_set_position, PTR("kansyu"), 450, 0, 0)
+    USER_FUNC(evt_npc_set_position, PTR("kansyu"), 125, 0, 0)
     USER_FUNC(evt_npc_set_property, PTR("kansyu"), 14, (s32)animsWhipGuy)
     USER_FUNC(evt_npc_set_anim, PTR("kansyu"), 0, 1)
     USER_FUNC(spm::evt_npc::evt_npc_entry, PTR("doopliss"), PTR("c_ranpel"), 0)
     USER_FUNC(spm::evt_npc::evt_npc_set_position, PTR("doopliss"), 0, -100, 0)
+    RUN_EVT(doopliss_cutscene)
   RETURN()
+  EVT_END()
+
+
+  EVT_BEGIN(doopliss_attack)
+    USER_FUNC(spm::evt_sub::evt_sub_random, 1, LW(0))
+    USER_FUNC(evt_npc_get_position, PTR("npc2"), LW(5), LW(6), LW(7))
+    SET(LW(15), LW(5))
+    SWITCH(LW(0))
+      CASE_EQUAL(0)
+        USER_FUNC(evt_npc_get_position, PTR("npc2"), LW(5), LW(6), LW(7))
+        ADD(LW(5), -150)
+        SET(LW(12), 150)
+        INLINE_EVT()
+          SET(LW(13), UW(3))
+          SUB(LW(13), 25)
+          USER_FUNC(spm::evt_cam::evt_cam3d_evt_zoom_in, 0, LW(5), EVT_NULLPTR, LW(13), LW(5), EVT_NULLPTR, 200, 1000, 11)
+        END_INLINE()
+        USER_FUNC(evt_npc_set_anim, PTR("npc2"), 2, 1)
+        USER_FUNC(evt_npc_walk_to, PTR("npc2"), LW(5), 0, LW(7), FLOAT(140.0), 0, 0, 0)
+        USER_FUNC(evt_npc_set_anim, PTR("npc2"), 11, 1)
+        USER_FUNC(spm::evt_mario::evt_mario_get_pos, LW(0), LW(1), LW(2))
+        INLINE_EVT()
+        SET(LW(10), 0)
+        LBL(1)
+          IF_SMALL(LW(10), 20)
+            USER_FUNC(check_pressed_b_ac, LW(11))
+            IF_EQUAL(LW(11), 1)
+              USER_FUNC(spm::evt_mario::evt_mario_set_pose, PTR("S_2"), 0)
+              WAIT_FRM(3)
+              USER_FUNC(spm::evt_mario::evt_mario_set_pose, PTR("S_1"), 0)
+              GOTO(2)
+            END_IF()
+          ELSE()
+            USER_FUNC(check_pressed_b_ac, LW(11))
+            IF_EQUAL(LW(11), 1)
+              USER_FUNC(ac_success_toggle)
+              USER_FUNC(spm::evt_mario::evt_mario_set_pose, PTR("S_2"), 0)
+              IF_LARGE_EQUAL(LW(10), 27)
+                USER_FUNC(superguard_toggle)
+                USER_FUNC(spm::evt_mario::evt_mario_set_pose, PTR("J_1A"), 0)
+              END_IF()
+              GOTO(2)
+            END_IF()
+          END_IF()
+          WAIT_FRM(1)
+          ADD(LW(10), 1)
+          IF_EQUAL(LW(10), 30)
+            GOTO(2)
+          END_IF()
+        GOTO(1)
+        LBL(2)
+        END_INLINE()
+        USER_FUNC(evt_npc_jump_to, PTR("npc2"), LW(0), LW(6), LW(7), 50, FLOAT(500.0))
+        USER_FUNC(spm::an2_08::evt_rpg_char_get, LW(3))
+        USER_FUNC(check_ac_success, LW(11))
+        IF_EQUAL(LW(11), 1)
+          USER_FUNC(check_superguard_success, LW(11))
+          IF_EQUAL(LW(11), 1)
+          USER_FUNC(spm::evt_snd::evt_snd_sfxon, PTR("SFX_F_COUNTER_REBOUND1"))
+          USER_FUNC(spm::evt_mario::evt_mario_set_pose, PTR("J_1B"), 0)
+          USER_FUNC(evt_npc_set_anim, PTR("npc2"), 4, 1)
+          USER_FUNC(spm::evt_mario::evt_mario_jump_to, LW(0), LW(6), LW(7), 20, 300)
+          BROTHER_EVT_ID(LW(4))
+          USER_FUNC(spm::evt_msg::evt_msg_print, 1, PTR("<dq><once_stop>"), 0, 0)
+          USER_FUNC(spm::evt_msg::evt_msg_print_add_insert, 1, PTR(superguard), LW(3))
+          END_BROTHER()
+          WAIT_MSEC(500)
+          ELSE()
+            SET(LW(11), 1)
+            USER_FUNC(spm::an2_08::evt_rpg_calc_mario_damage, 1, LW(10))
+            SUB(LW(10), 2)
+            IF_SMALL(LW(10), 0)
+              SET(LW(10), 0)
+            END_IF()
+            RUN_CHILD_EVT(mod::marioRPGtakeDamage)
+            USER_FUNC(spm::an2_08::evt_rpg_mario_take_damage, LW(10), 0, LW(0))
+            BROTHER_EVT_ID(LW(4))
+            USER_FUNC(spm::evt_msg::evt_msg_print, 1, PTR("<dq><once_stop>"), 0, 0)
+            USER_FUNC(spm::evt_msg::evt_msg_print_add_insert, 0, PTR("stg7_2_133_2_098"), LW(3), LW(10))
+            USER_FUNC(spm::evt_msg::evt_msg_continue)
+            END_BROTHER()
+          END_IF()
+        ELSE()
+          USER_FUNC(spm::an2_08::evt_rpg_calc_mario_damage, 1, LW(10))
+          RUN_CHILD_EVT(mod::marioRPGtakeDamage)
+          USER_FUNC(spm::an2_08::evt_rpg_mario_take_damage, LW(10), 0, LW(0))
+          BROTHER_EVT_ID(LW(4))
+          USER_FUNC(spm::evt_msg::evt_msg_print, 1, PTR("<dq><once_stop>"), 0, 0)
+          USER_FUNC(spm::evt_msg::evt_msg_print_add_insert, 0, PTR("stg7_2_133_2_098"), LW(3), LW(10))
+          USER_FUNC(spm::evt_msg::evt_msg_continue)
+          END_BROTHER()
+        END_IF()
+      CASE_EQUAL(1)
+        USER_FUNC(evt_npc_set_anim, PTR("npc2"), 6, 1)
+        USER_FUNC(evt_npc_wait_anim_end, PTR("npc2"), 1)
+        USER_FUNC(evt_npc_set_anim, PTR("npc2"), 7, 1)
+        WAIT_MSEC(500)
+        USER_FUNC(evt_npc_set_anim, PTR("npc2"), 8, 1)
+        USER_FUNC(evt_npc_get_position, PTR("npc2"), LW(5), LW(6), LW(7))
+        ADD(LW(6), 50)
+        USER_FUNC(spm::evt_cam::evt_cam3d_evt_zoom_in, 0, LW(5), EVT_NULLPTR, UW(3), LW(5), EVT_NULLPTR, 200, 2000, 11)
+        USER_FUNC(spm::evt_npc::evt_npc_glide_to, PTR("npc2"), LW(5), LW(6), LW(7), 0, FLOAT(40.0), 0, 11, 0, 0)
+        SUB(LW(6), 50)
+        ADD(LW(5), -150)
+        SET(LW(12), 150)
+        INLINE_EVT()
+          SET(LW(13), UW(3))
+          SUB(LW(13), 25)
+          USER_FUNC(spm::evt_cam::evt_cam3d_evt_zoom_in, 0, LW(5), EVT_NULLPTR, LW(13), LW(5), EVT_NULLPTR, 200, 1000, 11)
+        END_INLINE()
+        USER_FUNC(spm::evt_mario::evt_mario_get_pos, LW(0), LW(1), LW(2))
+        INLINE_EVT()
+        SET(LW(10), 0)
+        LBL(1)
+          IF_SMALL(LW(10), 20)
+            USER_FUNC(check_pressed_b_ac, LW(11))
+            IF_EQUAL(LW(11), 1)
+              USER_FUNC(spm::evt_mario::evt_mario_set_pose, PTR("S_2"), 0)
+              WAIT_FRM(3)
+              USER_FUNC(spm::evt_mario::evt_mario_set_pose, PTR("S_1"), 0)
+              GOTO(2)
+            END_IF()
+          ELSE()
+            USER_FUNC(check_pressed_b_ac, LW(11))
+            IF_EQUAL(LW(11), 1)
+              USER_FUNC(ac_success_toggle)
+              USER_FUNC(spm::evt_mario::evt_mario_set_pose, PTR("S_2"), 0)
+              IF_LARGE_EQUAL(LW(10), 27)
+                USER_FUNC(superguard_toggle)
+                USER_FUNC(spm::evt_mario::evt_mario_set_pose, PTR("J_1A"), 0)
+              END_IF()
+              GOTO(2)
+            END_IF()
+          END_IF()
+          WAIT_FRM(1)
+          ADD(LW(10), 1)
+          IF_EQUAL(LW(10), 30)
+            GOTO(2)
+          END_IF()
+        GOTO(1)
+        LBL(2)
+      END_INLINE()
+        WAIT_FRM(10)
+        USER_FUNC(spm::evt_npc::evt_npc_glide_to, PTR("npc2"), LW(0), LW(6), LW(7), 0, FLOAT(700.0), 0, 0, 0, 0)
+        //USER_FUNC(evt_npc_jump_to, PTR("npc2"), LW(0), LW(6), LW(7), 50, FLOAT(500.0))
+        USER_FUNC(spm::an2_08::evt_rpg_char_get, LW(3))
+        USER_FUNC(check_ac_success, LW(11))
+        IF_EQUAL(LW(11), 1)
+          USER_FUNC(check_superguard_success, LW(11))
+          IF_EQUAL(LW(11), 1)
+          USER_FUNC(spm::evt_snd::evt_snd_sfxon, PTR("SFX_F_COUNTER_REBOUND1"))
+          USER_FUNC(spm::evt_mario::evt_mario_set_pose, PTR("J_1B"), 0)
+          USER_FUNC(evt_npc_set_anim, PTR("npc2"), 4, 1)
+          USER_FUNC(spm::evt_mario::evt_mario_jump_to, LW(0), LW(6), LW(7), 20, 300)
+          BROTHER_EVT_ID(LW(4))
+          USER_FUNC(spm::evt_msg::evt_msg_print, 1, PTR("<dq><once_stop>"), 0, 0)
+          USER_FUNC(spm::evt_msg::evt_msg_print_add_insert, 1, PTR(superguard), LW(3))
+          END_BROTHER()
+          WAIT_MSEC(500)
+          ELSE()
+            SET(LW(11), 1)
+            USER_FUNC(spm::an2_08::evt_rpg_calc_mario_damage, 1, LW(10))
+            SUB(LW(10), 2)
+            IF_SMALL(LW(10), 0)
+              SET(LW(10), 0)
+            END_IF()
+            RUN_CHILD_EVT(mod::marioRPGtakeDamage)
+            USER_FUNC(spm::an2_08::evt_rpg_mario_take_damage, LW(10), 0, LW(0))
+            BROTHER_EVT_ID(LW(4))
+            USER_FUNC(spm::evt_msg::evt_msg_print, 1, PTR("<dq><once_stop>"), 0, 0)
+            USER_FUNC(spm::evt_msg::evt_msg_print_add_insert, 0, PTR("stg7_2_133_2_098"), LW(3), LW(10))
+            USER_FUNC(spm::evt_msg::evt_msg_continue)
+            END_BROTHER()
+          END_IF()
+        ELSE()
+          USER_FUNC(spm::an2_08::evt_rpg_calc_mario_damage, 1, LW(10))
+          RUN_CHILD_EVT(mod::marioRPGtakeDamage)
+          USER_FUNC(spm::an2_08::evt_rpg_mario_take_damage, LW(10), 0, LW(0))
+          BROTHER_EVT_ID(LW(4))
+          USER_FUNC(spm::evt_msg::evt_msg_print, 1, PTR("<dq><once_stop>"), 0, 0)
+          USER_FUNC(spm::evt_msg::evt_msg_print_add_insert, 0, PTR("stg7_2_133_2_098"), LW(3), LW(10))
+          USER_FUNC(spm::evt_msg::evt_msg_continue)
+          END_BROTHER()
+        END_IF()
+    END_SWITCH()
+  USER_FUNC(evt_npc_set_anim, PTR("npc2"), 2, 1)
+  ADD(LW(5), 150)
+  INLINE_EVT()
+    USER_FUNC(spm::evt_cam::evt_cam3d_evt_zoom_in, 0, UW(1), EVT_NULLPTR, UW(3), UW(1), EVT_NULLPTR, 200, 1000, 11)
+  END_INLINE()
+  USER_FUNC(spm::evt_npc::evt_npc_get_unitwork, PTR("npc2"), 0, LW(0))
+  USER_FUNC(spm::evt_npc::evt_npc_get_unitwork, PTR("npc2"), 1, LW(1))
+  USER_FUNC(spm::evt_npc::evt_npc_get_unitwork, PTR("npc2"), 2, LW(2))
+  USER_FUNC(evt_npc_walk_to, PTR("npc2"), LW(0), LW(1), LW(2), FLOAT(140.0), 0, 0, 0)
+  USER_FUNC(evt_npc_set_anim, PTR("npc2"), 0, 1)
+  USER_FUNC(ac_success_reset)
+  LBL(5)
+  CHK_EVT(LW(4), LW(0))
+  IF_EQUAL(LW(0), 0)
+    RETURN()
+  END_IF()
+  WAIT_FRM(1)
+  GOTO(5)
   EVT_END()
 
   void doopliss_main()
@@ -87,8 +403,9 @@ NPCTribeAnimDef animsDoopliss[] = {
     npcTribes[529].animPoseName = "c_ranpel";
     npcTribes[529].maxHp = 25;
     npcTribes[529].killXp = 3500;
+    npcTribes[529].attackStrength = 4;
     spm::map_data::MapData * mi3_03_md = spm::map_data::mapDataPtr("mi3_03");
-    evtpatch::hookEvtReplace(mi3_03_md->initScript, 32, (spm::evtmgr::EvtScriptCode*)doopliss_cutscene);
+    evtpatch::hookEvtReplace(mi3_03_md->initScript, 32, (spm::evtmgr::EvtScriptCode*)hampter_room_init);
   }
 
 }

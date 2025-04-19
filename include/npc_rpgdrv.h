@@ -51,7 +51,7 @@ typedef struct
 {
   s32 tribeId;
   NPCTribeAnimDef* animDefs;
-  EvtScriptCode* attackScript;
+  const EvtScriptCode* attackScript;
   EvtScriptCode* onHitScript;
   EvtScriptCode* deathScript;
   const char * battle_script = nullptr;
@@ -61,6 +61,7 @@ extern NPCTribeAnimDef animsKuribo[];
 
 EVT_DECLARE_USER_FUNC(get_rpg_enemy_attack_script, 2)
 EVT_DECLARE_USER_FUNC(get_rpg_enemy_info, 3)
+EVT_DECLARE(doopliss_attack)
 
 void npc_rpgdrv_main();
 
