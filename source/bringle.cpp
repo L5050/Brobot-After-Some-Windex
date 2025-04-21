@@ -10,6 +10,7 @@
 #include <spm/evt_mario.h>
 #include <spm/evtmgr.h>
 #include <spm/npcdrv.h>
+#include <spm/npc_dimeen_l.h>
 #include <spm/map_data.h>
 #include <spm/eff_zunbaba.h>
 #include <spm/evt_eff.h>
@@ -602,9 +603,9 @@ void bringle_main()
 
     spm::map_data::MapData * mapData = spm::map_data::mapDataPtr("he1_04");
     evtpatch::hookEvt(mapData->initScript, 42, (spm::evtmgr::EvtScriptCode*)hampter);
-    writeBranchLink( & spm::npcdrv::func_801e5fd0, 0x7D4, dimi_npcEntryFromSetupEnemy);
-    writeBranchLink( & spm::npcdrv::func_801e5fd0, 0x7B8, dimi_npcEntryFromSetupEnemy);
-    writeBranchLink( & spm::npcdrv::func_801e5fd0, 0x7F0, dimi_npcEntryFromSetupEnemy);
+    writeBranchLink( & spm::npc_dimeen_l::func_801e5fd0, 0x7D4, dimi_npcEntryFromSetupEnemy);
+    writeBranchLink( & spm::npc_dimeen_l::func_801e5fd0, 0x7B8, dimi_npcEntryFromSetupEnemy);
+    writeBranchLink( & spm::npc_dimeen_l::func_801e5fd0, 0x7F0, dimi_npcEntryFromSetupEnemy);
     spm::evtmgr::EvtScriptCode* dimentioOnSpawn = spm::npcdrv::npcEnemyTemplates[142].onSpawnScript;
     spm::evtmgr::EvtScriptCode* mainLogic = getInstructionEvtArg(dimentioOnSpawn, 5, 3);
     spm::evtmgr::EvtScriptCode* clones = getInstructionEvtArg(mainLogic, 58, 0);

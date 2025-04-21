@@ -42,6 +42,23 @@
 #include <string>
 namespace mod {
 
+s32 mario_chg_paper(spm::evtmgr::EvtEntry * evtEntry, bool firstRun)
+{
+    spm::evtmgr::EvtVar * args = (spm::evtmgr::EvtVar *)evtEntry->pCurData;
+    spm::mario::marioPaperOn((const char *) args[0]);
+    return 2;
+}
+
+s32 mario_set_scale(spm::evtmgr::EvtEntry * evtEntry, bool firstRun)
+{
+    spm::evtmgr::EvtVar * args = (spm::evtmgr::EvtVar *)evtEntry->pCurData;
+    f32 x = spm::evtmgr_cmd::evtGetFloat(evtEntry, args[0]);
+    f32 y = spm::evtmgr_cmd::evtGetFloat(evtEntry, args[1]);
+    f32 z = spm::evtmgr_cmd::evtGetFloat(evtEntry, args[2]);
+    spm::mario::marioGetPtr()->scale = {x, y, z};
+    return 2;
+}
+
 EVT_BEGIN(rpg_snd_miss_evt)
     USER_FUNC(spm::evt_snd::evt_snd_sfxon, PTR("SFX_EVT_HELWANWAN_MISS1"))
     DO(3)
@@ -831,7 +848,27 @@ EVT_BEGIN(pixls)
         CASE_EQUAL(227) //Cudge
             USER_FUNC(spm::an2_08::evt_rpg_char_get, LW(10))
             USER_FUNC(spm::evt_msg::evt_msg_print_add_insert, 0, PTR("stg7_2_133_2_044"), LW(10), LW(3))
-            USER_FUNC(spm::evt_sub::evt_sub_random, 1000, LW(10))
+            USER_FUNC(spm::evt_sub::evt_sub_random, 900, LW(10))
+            USER_FUNC(spm::evt_mario::evt_mario_get_pos, LW(5), LW(6), LW(7))
+            SET(LW(5), UW(4))
+            ADD(LW(5), 150)
+            INLINE_EVT()
+              SET(LW(10), UW(3))
+              SUB(LW(10), 25)
+              USER_FUNC(spm::evt_cam::evt_cam3d_evt_zoom_in, 0, LW(5), EVT_NULLPTR, LW(10), LW(5), EVT_NULLPTR, 200, 1000, 11)
+            END_INLINE()
+            SWITCH(LW(4))
+                CASE_EQUAL(0)
+                  USER_FUNC(spm::evt_npc::evt_npc_get_position, PTR("npc1"), LW(5), LW(6), LW(7))
+                CASE_EQUAL(1)
+                  USER_FUNC(spm::evt_npc::evt_npc_get_position, PTR("npc2"), LW(5), LW(6), LW(7))
+                CASE_EQUAL(2)
+                  USER_FUNC(spm::evt_npc::evt_npc_get_position, PTR("npc3"), LW(5), LW(6), LW(7))
+            END_SWITCH()
+            SUB(LW(5), 35)
+            INLINE_EVT()
+                USER_FUNC(spm::evt_mario::evt_mario_pos_change, LW(5), LW(7), FLOAT(45.0))
+            END_INLINE()
             USER_FUNC(mod::getFP, LW(5))
             IF_LARGE(LW(5), 0)
                 USER_FUNC(mod::subtractFP, 1)
@@ -854,8 +891,8 @@ EVT_BEGIN(pixls)
                   SET(LW(10), 0)
               END_SWITCH()
             END_IF()
+            USER_FUNC(spm::evt_mario::evt_mario_set_pose, PTR("H_1C"), 0)
             USER_FUNC(spm::evt_snd::evt_snd_sfxon, PTR("SFX_F_HAMMER_SWING1"))
-            USER_FUNC(spm::evt_snd::evt_snd_sfx_wait_name, PTR("SFX_F_HAMMER_SWING1"))
             IF_SMALL(LW(10), 900)
                 SET(LW(10), LW(4))
                 RUN_CHILD_EVT(mod::rpg_snd_miss_evt)
@@ -863,7 +900,10 @@ EVT_BEGIN(pixls)
             ELSE()
                 USER_FUNC(spm::evt_snd::evt_snd_sfxon, PTR("SFX_F_HAMMER_HIT1"))
                 SET(LW(10), LW(4))
-                RUN_CHILD_EVT(mod::rpg_snd_hit_evt)
+                RUN_EVT(mod::rpg_snd_hit_evt)
+                USER_FUNC(spm::evt_snd::evt_snd_sfxon, PTR("SFX_E_SMASH1"))
+                SET(LW(2), LW(4))
+                RUN_EVT(damageAnims)
                 USER_FUNC(spm::an2_08::evt_rpg_calc_damage_to_enemy, LW(4), 1, LW(10))
                 USER_FUNC(spm::evt_msg::evt_msg_print_add_insert, 0, PTR("stg7_2_133_2_045"), LW(3), LW(10))
                 USER_FUNC(spm::an2_08::evt_rpg_enemy_take_damage, LW(4), LW(10), 0, LW(0))
