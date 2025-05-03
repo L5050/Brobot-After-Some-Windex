@@ -52,16 +52,19 @@ typedef struct
   s32 tribeId;
   NPCTribeAnimDef* animDefs;
   const EvtScriptCode* attackScript;
-  EvtScriptCode* onHitScript;
-  EvtScriptCode* deathScript;
+  const EvtScriptCode* onHitScript;
+  const EvtScriptCode* deathScript;
   const char * battle_script = nullptr;
 } npc_rpg_data;
 
 extern NPCTribeAnimDef animsKuribo[];
 
 EVT_DECLARE_USER_FUNC(get_rpg_enemy_attack_script, 2)
+EVT_DECLARE_USER_FUNC(get_rpg_enemy_death_script, 2)
 EVT_DECLARE_USER_FUNC(get_rpg_enemy_info, 3)
+EVT_DECLARE_USER_FUNC(evt_rpg_revive_enemy, 2)
 EVT_DECLARE(doopliss_attack)
+EVT_DECLARE(doopliss_death)
 
 void npc_rpgdrv_main();
 

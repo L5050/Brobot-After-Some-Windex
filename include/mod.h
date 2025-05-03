@@ -8,6 +8,12 @@ namespace mod {
 
 #define MOD_VERSION "SPM-RPG-Battles"
 
+extern "C" {
+
+EVT_DECLARE(evt_memcard_save)
+
+}
+
 extern s32 fp;
 extern bool gIsDolphin;
 extern bool gIsRiivolution;

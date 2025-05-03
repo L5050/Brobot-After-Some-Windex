@@ -20,6 +20,8 @@ namespace mod {
   EVT_DECLARE_USER_FUNC(calc_peach_heal, 1)
   EVT_DECLARE_USER_FUNC(check_pressed_2_ac, 1)
   EVT_DECLARE_USER_FUNC(check_pressed_b_ac, 1)
+  EVT_DECLARE_USER_FUNC(check_pressed_a_ac, 1)
+  EVT_DECLARE_USER_FUNC(mario_rotate, 1)
   EVT_DECLARE_USER_FUNC(check_ac_success, 1)
   EVT_DECLARE_USER_FUNC(check_superguard_success, 1)
   EVT_DECLARE_USER_FUNC(ac_success_toggle, 0)

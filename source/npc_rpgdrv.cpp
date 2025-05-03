@@ -88,10 +88,29 @@ NPCTribeAnimDef animsKuribo[] = {
   s32 get_rpg_enemy_attack_script(spm::evtmgr::EvtEntry * evtEntry, bool firstRun)
   {
     spm::evtmgr::EvtVar * args = (spm::evtmgr::EvtVar *)evtEntry->pCurData;
-    s32 tribeId = getRpgTribeID(args[0]);
+    s32 tribeId = getRpgTribeID(spm::evtmgr_cmd::evtGetValue(evtEntry, args[0]));
     s32 index = getDataTableIndex(tribeId);
     spm::evtmgr_cmd::evtSetValue(evtEntry, args[1], (s32)npcDataTable[index].attackScript);
     wii::os::OSReport("Getting attack script\n");
+    return 2;
+  }
+
+  s32 get_rpg_enemy_death_script(spm::evtmgr::EvtEntry * evtEntry, bool firstRun)
+  {
+    spm::evtmgr::EvtVar * args = (spm::evtmgr::EvtVar *)evtEntry->pCurData;
+    s32 tribeId = getRpgTribeID(spm::evtmgr_cmd::evtGetValue(evtEntry, args[0]));
+    s32 index = getDataTableIndex(tribeId);
+    spm::evtmgr_cmd::evtSetValue(evtEntry, args[1], (s32)npcDataTable[index].deathScript);
+    wii::os::OSReport("Getting death script\n");
+    return 2;
+  }
+
+  s32 evt_rpg_revive_enemy(spm::evtmgr::EvtEntry * evtEntry, bool firstRun)
+  {
+    spm::evtmgr::EvtVar * args = (spm::evtmgr::EvtVar *)evtEntry->pCurData;
+    s32 index = spm::evtmgr_cmd::evtGetValue(evtEntry, args[0]);
+    s32 newHealth = spm::evtmgr_cmd::evtGetValue(evtEntry, args[1]);
+    spm::an2_08::an2_08_wp.rpgNpcInfo[index].maxHp = newHealth;
     return 2;
   }
 
@@ -125,7 +144,7 @@ NPCTribeAnimDef animsKuribo[] = {
     npcDataTable[1] = {125, animsOcta2, nullptr, nullptr, nullptr};
     NPCTribeAnimDef * animsDoopliss = getDooplissAnims();
     doopliss_main();
-    npcDataTable[2] = {529, animsDoopliss, doopliss_attack, nullptr, nullptr}; // Doopliss
+    npcDataTable[2] = {529, animsDoopliss, doopliss_attack, nullptr, doopliss_death}; // Doopliss
   }
 
 }

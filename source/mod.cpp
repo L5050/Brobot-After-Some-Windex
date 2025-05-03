@@ -1573,8 +1573,9 @@ bool IsNpcActive(s32 index) {
 
   s32 new_evt_rpg_calc_damage_to_enemy(spm::evtmgr::EvtEntry * evtEntry, bool firstRun) {
     spm::evtmgr::EvtVar * args = (spm::evtmgr::EvtVar *)evtEntry->pCurData;
+    s32 index = spm::evtmgr_cmd::evtGetValue(evtEntry, args[0]);
     s32 damageType = args[1];
-    s32 damage = spm::mario::marioCalcDamageToEnemy(damageType, rpgTribeID[evtEntry->lw[2]]);
+    s32 damage = spm::mario::marioCalcDamageToEnemy(damageType, rpgTribeID[index]);
     if (rpgTribeID[1] == 296) damage = damage + 4;
     spm::evtmgr_cmd::evtSetValue(evtEntry, args[2], damage);
     if (firstRun == false) {}
@@ -1824,6 +1825,18 @@ bool IsNpcActive(s32 index) {
     spm::evtmgr::EvtVar * args = (spm::evtmgr::EvtVar *)evtEntry->pCurData;
     u32 pressed = spm::wpadmgr::wpadGetButtonsPressed(0);
     if (pressed & 0x100) {
+      wii::os::OSReport("Succeeded action command!\n");
+      spm::evtmgr_cmd::evtSetValue(evtEntry, args[0], 1);
+    } else {
+      spm::evtmgr_cmd::evtSetValue(evtEntry, args[0], 0);
+    }
+    return 2;
+  }
+
+  s32 check_pressed_a_ac(spm::evtmgr::EvtEntry * evtEntry, bool firstRun) {
+    spm::evtmgr::EvtVar * args = (spm::evtmgr::EvtVar *)evtEntry->pCurData;
+    u32 pressed = spm::wpadmgr::wpadGetButtonsPressed(0);
+    if (pressed & 0x800) {
       wii::os::OSReport("Succeeded action command!\n");
       spm::evtmgr_cmd::evtSetValue(evtEntry, args[0], 1);
     } else {
