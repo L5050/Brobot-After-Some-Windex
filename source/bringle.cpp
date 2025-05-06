@@ -32,7 +32,7 @@ static void seq_titleMainOverride(spm::seqdrv::SeqWork *wp)
 {
     wii::gx::GXColor green = {0, 255, 0, 255};
     f32 scale = 0.8f;
-    const char * msg = "SPM-Bringle-IDK";
+    const char * msg = "SPM-Bringle-IDK-Turtle";
     spm::fontmgr::FontDrawStart();
     spm::fontmgr::FontDrawEdge();
     spm::fontmgr::FontDrawColor(&green);
@@ -126,6 +126,7 @@ s32 check_pressed_b_brognle(spm::evtmgr::EvtEntry * evtEntry, bool firstRun) {
   
     EVT_BEGIN(hampter2)
     USER_FUNC(spm::evt_npc::evt_npc_tribe_agb_async, 426)
+    USER_FUNC(spm::evt_snd::evt_snd_bgmoff, 0)
     USER_FUNC(check_pressed_b_brognle)
     USER_FUNC(spm::evt_mario::evt_mario_get_pos, LW(0), LW(1), LW(2))
     SET(LW(10), 1)
@@ -173,7 +174,6 @@ s32 check_pressed_b_brognle(spm::evtmgr::EvtEntry * evtEntry, bool firstRun) {
     GOTO(100)
     WHILE()
     USER_FUNC(check_pressed_b_brognle)
-    USER_FUNC(spm::evt_snd::evt_snd_bgmon, 0, PTR("BGM_BTL_BOSS_STG1"))
     USER_FUNC(spm::evt_mario::evt_mario_get_pos, LW(0), LW(1), LW(2))
     USER_FUNC(patchAsserts)
     USER_FUNC(spm::evt_npc::evt_npc_tribe_agb_async, 44)

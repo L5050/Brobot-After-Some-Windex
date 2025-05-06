@@ -1584,6 +1584,7 @@ bool IsNpcActive(s32 index) {
 
   s32 new_evt_rpg_calc_mario_damage(spm::evtmgr::EvtEntry * evtEntry, bool firstRun) {
     spm::evtmgr::EvtVar * args = (spm::evtmgr::EvtVar *)evtEntry->pCurData;
+    
     s32 attackStrength = spm::an2_08::an2_08_wp.rpgNpcInfo[evtEntry->uw[0]].attackStrength;
     if (attackStrength == 0) attackStrength = 1;
     if ((spm::an2_08::an2_08_wp.unk_54 & 0x40U) != 0) {
@@ -1594,6 +1595,8 @@ bool IsNpcActive(s32 index) {
         attackStrength = 1;
       }
     }
+    wii::os::OSReport("doop strength %d\n", attackStrength);
+    wii::os::OSReport("doop index %d\n", evtEntry->uw[0]);
     spm::evtmgr_cmd::evtSetValue(evtEntry, args[1], attackStrength);
     if (firstRun == false) {}
     return 2;
@@ -1651,8 +1654,8 @@ bool IsNpcActive(s32 index) {
     turnBasedCombatOverride[0].value = turnBasedCombatOverrideFunc;
     turnBasedCombatOverride[1].type = 0;
     turnBasedCombatOverride[1].value = nullptr;
-    spm::npcdrv::npcEnemyTemplates[2].unkDefinitionTable = turnBasedCombatOverride;
-    spm::npcdrv::npcEnemyTemplates[250].unkDefinitionTable = turnBasedCombatOverride;
+    //spm::npcdrv::npcEnemyTemplates[2].unkDefinitionTable = turnBasedCombatOverride;
+    //spm::npcdrv::npcEnemyTemplates[250].unkDefinitionTable = turnBasedCombatOverride;
   }
 
   void deleteUnderchompTextures() {
