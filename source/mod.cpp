@@ -20,7 +20,6 @@
 #include <spm/dispdrv.h>
 #include <spm/animdrv.h>
 #include <spm/npcdrv.h>
-#include <spm/camdrv.h>
 #include <spm/fontmgr.h>
 #include <spm/seqdrv.h>
 #include <spm/seqdef.h>
@@ -67,13 +66,13 @@ extern "C" {
 
   void drawStuff() {
     // Flower disp
-    const Vec3 fpVec = {-100.0, -200.0, 0.0};
+    const Vec3 fpVec = {-100.0, -202.0, 0.0};
     spm::icondrv::iconDispGx(0.7, &fpVec, 4, 105);
     // FP number disp
-    wii::gx::GXColor green = {
-      0,
+    wii::gx::GXColor white = {
       255,
-      0,
+      255,
+      255,
       255
     };
     f32 scale = 1.0;
@@ -82,12 +81,12 @@ extern "C" {
     const char * msg = buffer;
     spm::fontmgr::FontDrawStart();
     spm::fontmgr::FontDrawEdge();
-    spm::fontmgr::FontDrawColor( & green);
+    spm::fontmgr::FontDrawColor( & white);
     spm::fontmgr::FontDrawScale(scale);
     spm::fontmgr::FontDrawNoiseOff();
-    spm::fontmgr::FontDrawRainbowColor();
+    spm::fontmgr::FontDrawRainbowColorOff();
     f32 x = -((spm::fontmgr::FontGetMessageWidth(msg) * scale) / 2);
-    spm::fontmgr::FontDrawString(x+-60, -171.0, msg);
+    spm::fontmgr::FontDrawString(x+-70, -172.0, msg);
     return;
   }
 
@@ -1595,8 +1594,6 @@ bool IsNpcActive(s32 index) {
         attackStrength = 1;
       }
     }
-    wii::os::OSReport("doop strength %d\n", attackStrength);
-    wii::os::OSReport("doop index %d\n", evtEntry->uw[0]);
     spm::evtmgr_cmd::evtSetValue(evtEntry, args[1], attackStrength);
     if (firstRun == false) {}
     return 2;
@@ -1614,7 +1611,7 @@ bool IsNpcActive(s32 index) {
         rpgIsActive[1] = true;
         rpgIsActive[2] = true;
         rpgTribeID[0] = 0;
-        rpgTribeID[1] = 309;
+        rpgTribeID[1] = 0;
         rpgTribeID[2] = 0;
       break;
       case 125:
@@ -1654,8 +1651,8 @@ bool IsNpcActive(s32 index) {
     turnBasedCombatOverride[0].value = turnBasedCombatOverrideFunc;
     turnBasedCombatOverride[1].type = 0;
     turnBasedCombatOverride[1].value = nullptr;
-    //spm::npcdrv::npcEnemyTemplates[2].unkDefinitionTable = turnBasedCombatOverride;
-    //spm::npcdrv::npcEnemyTemplates[250].unkDefinitionTable = turnBasedCombatOverride;
+    spm::npcdrv::npcEnemyTemplates[2].unkDefinitionTable = turnBasedCombatOverride;
+    spm::npcdrv::npcEnemyTemplates[250].unkDefinitionTable = turnBasedCombatOverride;
   }
 
   void deleteUnderchompTextures() {
@@ -1674,7 +1671,18 @@ bool IsNpcActive(s32 index) {
     if (screenOn)
     {
       rpg_screen_draw();
+      drawStuff();
     }
+  }
+
+  spm::mario::MarioWork* patchTechniques()
+  {
+    spm::mario::MarioWork* mwp = spm::mario::marioGetPtr();
+    if (mwp->character == 0 || mwp->character == 3)
+    {
+      asm("li 12, 0x3");
+    }
+    return mwp;
   }
 
   void hookEvent() {
@@ -1694,8 +1702,11 @@ bool IsNpcActive(s32 index) {
     writeBranchLink( & spm::an2_08::rpgHandleMenu, 0x1BC, returnCharacterTechnique);
     writeBranchLink( & spm::an2_08::evt_rpg_npctribe_handle, 0x94, returnTribe);
     //writeBranchLink( & spm::an2_08::rpg_screen_draw, 0x2D8, setTextureIndex);
-    writeBranch( & spm::an2_08::rpg_screen_draw, 0x6F4, drawStuff);
     writeBranchLink( & spm::acdrv::acMain, 0x49C, setNewFloat);
+    writeBranchLink( & spm::an2_08::evt_rpg_choice_handler, 0x764, patchTechniques);
+    writeWord( & spm::an2_08::evt_rpg_choice_handler, 0x768, 0x60000000);
+    writeWord( & spm::an2_08::evt_rpg_choice_handler, 0x76C, 0x2C0C0003);
+    //writeWord( & spm::an2_08::evt_rpg_choice_handler, 0x76C, 0x2C000001);
     //writeWord( & spm::an2_08::evt_rpg_npctribe_handle, 0xA0, 0x3B9C0004);
     //writeWord( & spm::an2_08::evt_rpg_npctribe_handle, 0x8C, 0x3BA00018);
     writeWord( & spm::an2_08::evt_rpg_npctribe_handle, 0x2BC, 0x60000000);
@@ -1735,7 +1746,7 @@ bool IsNpcActive(s32 index) {
   }
 
   s32 rpg_npc_setup(spm::evtmgr::EvtEntry * evtEntry, bool firstRun) {
-    spm::camdrv::camPtrTbl[5] -> isOrthoToggle = 0;
+    spm::camdrv::camPtrTbl[5] -> isOrthoToggle = 1;
     for (int i = 0; i < 3; i++) {
       if (rpgIsActive[i]) {
         spm::an2_08::an2_08_wp.rpgNpcInfo[i].attackStrength = spm::npcdrv::npcTribes[rpgTribeID[i]].attackStrength;
@@ -1943,12 +1954,11 @@ s32 check_superguard_success(spm::evtmgr::EvtEntry * evtEntry, bool firstRun) {
 
   void main() {
     wii::os::OSReport("SPM Rel Loader: the mod has ran!\n");
-    //titleScreenCustomTextPatch();
+    titleScreenCustomTextPatch();
     evtpatch::evtmgrExtensionInit();
     hookEvent();
     patchBrobot();
     npc_rpgdrv_main();
-    bringle_main();
   }
 
 }

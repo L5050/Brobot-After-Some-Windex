@@ -30,7 +30,6 @@ EVT_DECLARE_USER_FUNC(mario_set_scale, 3)
 EVT_DECLARE_USER_FUNC(mario_chg_paper, 1)
 
 void patchTpl(u32 destId, u32 srcId, wii::tpl::TPLHeader *destTpl, wii::tpl::TPLHeader *srcTpl, const char *filePath = nullptr, bool free = false);
-void bringle_main();
 void main();
 
 }
